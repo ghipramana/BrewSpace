@@ -179,7 +179,6 @@ export const createProduct = async (productData) => {
       origin: productData.origin || 'Nusantara',
       price: Number(productData.price || 0),
       stock: Number(productData.stock || 0),
-      rating: 5.0,
       description: productData.description || '',
       image_url: productData.image_url || 'https://images.unsplash.com/photo-1587734195503-904fca47e0e9?auto=format&fit=crop&w=600&q=80',
       is_featured: Boolean(productData.is_featured),
