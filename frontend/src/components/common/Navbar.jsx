@@ -6,7 +6,7 @@ import { useAuth } from '../../context/AuthContext';
 
 export const Navbar = () => {
   const { itemCount } = useCart();
-  const { user, isAuthenticated } = useAuth();
+  const { user, isAuthenticated, loading: authLoading } = useAuth();
 
   return (
     <header className="top-header">
@@ -72,7 +72,7 @@ export const Navbar = () => {
           </Link>
 
           {/* Auth status on Desktop */}
-          {isAuthenticated ? (
+          {authLoading ? null : isAuthenticated ? (
             <Link to="/profile" className="profile-header-pill desktop-only" aria-label="Profil Akun">
               <div className="profile-header-avatar">
                 <User size={16} />

@@ -1,17 +1,22 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Coffee, Lock, Mail, User, ArrowRight, AlertCircle } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 
 export const Register = () => {
   const navigate = useNavigate();
-  const { register } = useAuth();
+  const { register, isAuthenticated, loading: authLoading } = useAuth();
 
   const [fullName, setFullName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
   const [errorMsg, setErrorMsg] = useState('');
+  const [successMsg, setSuccessMsg] = useState('');
+
+  useEffect(() => {
+    if (!authLoading && isAuthenticated) navigate('/', { replace: true });
+  }, [authLoading, isAuthenticated, navigate]);
 
   const handleRegister = async (e) => {
     e.preventDefault();
@@ -28,7 +33,11 @@ export const Register = () => {
     try {
       setLoading(true);
       setErrorMsg('');
-      await register(email, password, fullName);
+      const result = await register(email, password, fullName);
+      if (result.requiresEmailConfirmation) {
+        setSuccessMsg('Akun berhasil dibuat. Cek email untuk verifikasi, lalu masuk dengan akun tersebut.');
+        return;
+      }
       navigate('/');
     } catch (err) {
       console.error('Register error:', err);
@@ -68,6 +77,20 @@ export const Register = () => {
           }}>
             <AlertCircle size={16} />
             <span>{errorMsg}</span>
+          </div>
+        )}
+
+        {successMsg && (
+          <div role="status" style={{
+            backgroundColor: '#E8F5E9',
+            border: '1px solid #C8E6C9',
+            color: '#256B36',
+            padding: '10px 14px',
+            borderRadius: 'var(--radius-md)',
+            fontSize: '0.82rem',
+            marginBottom: '16px'
+          }}>
+            {successMsg}
           </div>
         )}
 

@@ -51,7 +51,7 @@ export const Profile = () => {
       setSaveLoading(true);
       await updateUserProfile(user?.id || 'u0000000-0000-0000-0000-000000000001', formData);
       setProfile({ ...formData });
-      await updateUserName(formData.full_name);
+      if (user) await updateUserName(formData.full_name);
       setIsEditing(false);
       setSaveSuccess(true);
       setTimeout(() => setSaveSuccess(false), 2500);

@@ -8,35 +8,47 @@ export const AuthProvider = ({ children }) => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // Ambil sesi user saat pertama kali load
-    const initAuth = async () => {
-      try {
-        const currentUser = await authService.getCurrentUser();
-        setUser(currentUser);
-      } catch (err) {
-        console.error('Error init auth:', err);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    initAuth();
-
-    // Supabase auth state change listener jika terhubung
+    let active = true;
     if (supabaseClient) {
+      let receivedAuthEvent = false;
+      const applySession = (session) => {
+        if (!active) return;
+        setUser(session?.user || null);
+        if (session?.access_token) {
+          localStorage.setItem('brewspace_token', session.access_token);
+        } else {
+          localStorage.removeItem('brewspace_token');
+        }
+        setLoading(false);
+      };
+
       const { data: { subscription } } = supabaseClient.auth.onAuthStateChange(
-        (event, session) => {
-          if (session?.user) {
-            setUser(session.user);
-            localStorage.setItem('brewspace_token', session.access_token);
-          } else {
-            setUser(null);
-            localStorage.removeItem('brewspace_token');
-          }
+        (_event, session) => {
+          receivedAuthEvent = true;
+          applySession(session);
         }
       );
-      return () => subscription.unsubscribe();
+
+      supabaseClient.auth.getSession().then(({ data, error }) => {
+        if (error) console.error('Gagal memuat sesi login:', error.message);
+        if (!receivedAuthEvent) applySession(data?.session || null);
+      }).catch((error) => {
+        console.error('Gagal memuat sesi login:', error);
+        if (active) setLoading(false);
+      });
+
+      return () => {
+        active = false;
+        subscription.unsubscribe();
+      };
     }
+
+    authService.getCurrentUser()
+      .then((currentUser) => { if (active) setUser(currentUser); })
+      .catch((error) => console.error('Error init auth:', error))
+      .finally(() => { if (active) setLoading(false); });
+
+    return () => { active = false; };
   }, []);
 
   const login = async (email, password) => {
@@ -46,14 +58,15 @@ export const AuthProvider = ({ children }) => {
   };
 
   const register = async (email, password, fullName) => {
-    const registeredUser = await authService.signUp(email, password, fullName);
-    setUser(registeredUser);
-    return registeredUser;
+    const result = await authService.signUp(email, password, fullName);
+    if (!result.requiresEmailConfirmation) setUser(result.user);
+    return result;
   };
 
   const updateUserName = async (fullName) => {
+    if (!user) return null;
     const updatedUser = await authService.updateFullName(fullName);
-    setUser(updatedUser);
+    if (updatedUser) setUser(updatedUser);
     return updatedUser;
   };
 

@@ -447,26 +447,61 @@ export const checkoutOrder = async (payload) => {
 // SERVICE: USER PROFILE
 // ==============================================================================
 
-export const getUserProfile = async (userId) => {
+const getCachedUserProfile = (userId) => {
   try {
-    return await apiClient.get(`/users/${userId}`);
+    return JSON.parse(localStorage.getItem(`brewspace_profile_${userId}`)) || {};
   } catch {
-    const user = JSON.parse(localStorage.getItem('brewspace_user')) || {
+    return {};
+  }
+};
+
+const saveCachedUserProfile = (userId, profile) => {
+  localStorage.setItem(`brewspace_profile_${userId}`, JSON.stringify(profile));
+};
+
+export const getUserProfile = async (userId) => {
+  const cachedProfile = getCachedUserProfile(userId);
+  try {
+    const response = await apiClient.get(`/users/${userId}`);
+    const data = { ...response.data, ...cachedProfile };
+    saveCachedUserProfile(userId, data);
+    return { ...response, data };
+  } catch {
+    let localUser = {};
+    try {
+      localUser = JSON.parse(localStorage.getItem('brewspace_user')) || {};
+    } catch {
+      localUser = {};
+    }
+    const data = { ...localUser, ...cachedProfile };
+    const user = Object.keys(data).length ? data : {
       full_name: 'Penikmat Kopi Praktikum',
       email: 'mahasiswa@brewspace.ac.id',
       phone: '081234567890',
       address: 'Jl. Kampus Merdeka No. 12, Sleman, Yogyakarta'
     };
+    saveCachedUserProfile(userId, user);
     return { success: true, data: user };
   }
 };
 
 export const updateUserProfile = async (userId, payload) => {
+  const cachedProfile = getCachedUserProfile(userId);
+  const updatedProfile = { ...cachedProfile, ...payload };
+  saveCachedUserProfile(userId, updatedProfile);
   try {
-    return await apiClient.put(`/users/${userId}`, payload);
+    const response = await apiClient.put(`/users/${userId}`, payload);
+    const data = { ...response.data, ...updatedProfile };
+    saveCachedUserProfile(userId, data);
+    return { ...response, data };
   } catch {
-    const user = JSON.parse(localStorage.getItem('brewspace_user')) || {};
-    const updated = { ...user, ...payload };
+    let user = {};
+    try {
+      user = JSON.parse(localStorage.getItem('brewspace_user')) || {};
+    } catch {
+      user = {};
+    }
+    const updated = { ...user, ...updatedProfile };
     localStorage.setItem('brewspace_user', JSON.stringify(updated));
     return { success: true, data: updated };
   }

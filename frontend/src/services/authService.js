@@ -32,14 +32,20 @@ export const authService = {
         email,
         password,
         options: {
-          data: { full_name: fullName }
+          data: { full_name: fullName },
+          emailRedirectTo: window.location.origin
         }
       });
       if (error) throw error;
       if (data.session?.access_token) {
         localStorage.setItem('brewspace_token', data.session.access_token);
+      } else {
+        localStorage.removeItem('brewspace_token');
       }
-      return data.user;
+      return {
+        user: data.user,
+        requiresEmailConfirmation: !data.session
+      };
     }
 
     // Fallback registration
@@ -50,7 +56,7 @@ export const authService = {
     };
     localStorage.setItem('brewspace_token', 'demo-token-' + Date.now());
     localStorage.setItem('brewspace_user', JSON.stringify(mockUser));
-    return mockUser;
+    return { user: mockUser, requiresEmailConfirmation: false };
   },
 
   /**
@@ -89,7 +95,8 @@ export const authService = {
     }
 
     const savedUser = localStorage.getItem('brewspace_user');
-    const currentUser = savedUser ? JSON.parse(savedUser) : defaultMockUser;
+    if (!savedUser) return null;
+    const currentUser = JSON.parse(savedUser);
     const updatedUser = {
       ...currentUser,
       user_metadata: {
@@ -126,9 +133,9 @@ export const authService = {
       try {
         return JSON.parse(saved);
       } catch {
-        return defaultMockUser;
+        return null;
       }
     }
-    return defaultMockUser;
+    return null;
   }
 };
