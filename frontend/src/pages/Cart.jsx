@@ -73,8 +73,6 @@ export const Cart = () => {
                           </button>
                         </div>
 
-                        <span className="cart-item-option">Gilingan: {item.grind_option || 'Biji Utuh'}</span>
-
                         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginTop: 'auto' }}>
                           <span className="cart-item-price">{formatRupiah(itemPrice)}</span>
 

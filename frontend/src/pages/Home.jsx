@@ -67,11 +67,11 @@ export const Home = () => {
 
       <main className="page-content">
         {/* Greeting Section */}
-        <div style={{ padding: '16px 18px 6px 18px' }}>
-          <p style={{ fontSize: '0.82rem', color: 'var(--text-muted)' }}>
+        <div className="home-greeting-section">
+          <p style={{ fontSize: '0.84rem', color: 'var(--text-muted)' }}>
             Selamat datang,
           </p>
-          <h2 style={{ fontFamily: 'var(--font-serif)', fontSize: '1.4rem', color: 'var(--primary)', fontWeight: 700 }}>
+          <h2 style={{ fontFamily: 'var(--font-serif)', fontSize: '1.5rem', color: 'var(--primary)', fontWeight: 700 }}>
             {displayName} 👋
           </h2>
         </div>

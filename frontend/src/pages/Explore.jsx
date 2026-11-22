@@ -104,11 +104,11 @@ export const Explore = () => {
 
       <main className="page-content">
         {/* Title & Filter Bar */}
-        <div style={{ padding: '16px 18px 8px 18px' }}>
-          <h1 style={{ fontFamily: 'var(--font-serif)', fontSize: '1.4rem', color: 'var(--primary)', fontWeight: 700 }}>
+        <div className="page-title-section">
+          <h1 style={{ fontFamily: 'var(--font-serif)', fontSize: '1.5rem', color: 'var(--primary)', fontWeight: 700 }}>
             Jelajahi Kopi Pilihan
           </h1>
-          <p style={{ fontSize: '0.82rem', color: 'var(--text-muted)' }}>
+          <p style={{ fontSize: '0.86rem', color: 'var(--text-muted)' }}>
             Temukan biji, bubuk, dan sajian kopi spesial dari berbagai penjuru tanah air.
           </p>
         </div>

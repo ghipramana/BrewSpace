@@ -16,6 +16,7 @@ import { Checkout } from './pages/Checkout';
 import { OrderDetail } from './pages/OrderDetail';
 import { Login } from './pages/Login';
 import { Register } from './pages/Register';
+import { AdminProducts } from './pages/AdminProducts';
 
 export default function App() {
   return (
@@ -32,6 +33,7 @@ export default function App() {
             <Route path="/favorites" element={<Favorites />} />
             <Route path="/orders" element={<Orders />} />
             <Route path="/profile" element={<Profile />} />
+            <Route path="/admin/products" element={<AdminProducts />} />
 
             {/* Halaman Transaksi & Detail Produk (Standalone Page) */}
             <Route path="/products/:id" element={<ProductDetail />} />

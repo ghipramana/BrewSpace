@@ -36,6 +36,21 @@ apiClient.interceptors.response.use(
 // SERVICE: PRODUK & KATEGORI (Dengan Fallback Cerdas jika Backend Belum Nyala)
 // ==============================================================================
 
+const getStoredProducts = () => {
+  try {
+    const stored = localStorage.getItem('brewspace_local_products');
+    if (stored) {
+      const parsed = JSON.parse(stored);
+      if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+    }
+  } catch {}
+  return [...fallbackProducts];
+};
+
+const saveStoredProducts = (products) => {
+  localStorage.setItem('brewspace_local_products', JSON.stringify(products));
+};
+
 export const getCategories = async () => {
   try {
     const res = await apiClient.get('/categories');
@@ -62,7 +77,7 @@ export const getProducts = async (params = {}) => {
     return res;
   } catch (err) {
     console.warn('[BrewSpace] Backend belum menyala di port 5000, menggunakan data lokal produk:', err.message);
-    let results = [...fallbackProducts];
+    let results = getStoredProducts();
 
     if (params.category_id) {
       results = results.filter(p => p.category_id === parseInt(params.category_id, 10));
@@ -100,8 +115,103 @@ export const getProductById = async (id) => {
     return res;
   } catch (err) {
     console.warn('[BrewSpace] Backend belum menyala di port 5000, menggunakan data lokal detail produk');
-    const prod = fallbackProducts.find(p => p.id === id) || fallbackProducts[0];
+    const products = getStoredProducts();
+    const prod = products.find(p => p.id === id) || products[0];
     return { success: true, data: prod };
+  }
+};
+
+/**
+ * CREATE: Tambah produk kopi baru
+ */
+export const createProduct = async (productData) => {
+  try {
+    const res = await apiClient.post('/products', productData);
+    // Sync ke local store juga
+    const products = getStoredProducts();
+    const created = res.data || { id: 'p-' + Date.now(), ...productData };
+    products.unshift(created);
+    saveStoredProducts(products);
+    return res;
+  } catch (err) {
+    console.warn('[BrewSpace] Backend offline, menyimpan produk baru secara lokal:', err.message);
+    const products = getStoredProducts();
+    const cat = fallbackCategories.find(c => c.id === Number(productData.category_id)) || { id: 1, name: 'Biji Kopi', slug: 'biji-kopi' };
+    const newProduct = {
+      id: 'p-' + Date.now(),
+      name: productData.name,
+      category_id: Number(productData.category_id || 1),
+      origin: productData.origin || 'Nusantara',
+      roast_level: productData.roast_level || 'Medium',
+      price: Number(productData.price || 0),
+      stock: Number(productData.stock || 0),
+      rating: 5.0,
+      reviews_count: 0,
+      description: productData.description || '',
+      image_url: productData.image_url || 'https://images.unsplash.com/photo-1587734195503-904fca47e0e9?auto=format&fit=crop&w=600&q=80',
+      is_featured: Boolean(productData.is_featured),
+      is_best_seller: Boolean(productData.is_best_seller),
+      categories: cat,
+      created_at: new Date().toISOString()
+    };
+    products.unshift(newProduct);
+    saveStoredProducts(products);
+    return { success: true, data: newProduct, message: 'Produk berhasil ditambahkan' };
+  }
+};
+
+/**
+ * UPDATE: Perbarui data produk
+ */
+export const updateProduct = async (id, updateData) => {
+  try {
+    const res = await apiClient.put(`/products/${id}`, updateData);
+    // Sync ke local store
+    const products = getStoredProducts();
+    const idx = products.findIndex(p => p.id === id);
+    if (idx !== -1) {
+      products[idx] = { ...products[idx], ...updateData };
+      saveStoredProducts(products);
+    }
+    return res;
+  } catch (err) {
+    console.warn('[BrewSpace] Backend offline, memperbarui produk secara lokal:', err.message);
+    const products = getStoredProducts();
+    const idx = products.findIndex(p => p.id === id);
+    if (idx !== -1) {
+      const cat = updateData.category_id
+        ? fallbackCategories.find(c => c.id === Number(updateData.category_id))
+        : products[idx].categories;
+      products[idx] = {
+        ...products[idx],
+        ...updateData,
+        price: updateData.price !== undefined ? Number(updateData.price) : products[idx].price,
+        stock: updateData.stock !== undefined ? Number(updateData.stock) : products[idx].stock,
+        categories: cat || products[idx].categories
+      };
+      saveStoredProducts(products);
+      return { success: true, data: products[idx], message: 'Produk berhasil diperbarui' };
+    }
+    throw new Error('Produk dengan ID tersebut tidak ditemukan');
+  }
+};
+
+/**
+ * DELETE: Hapus produk
+ */
+export const deleteProduct = async (id) => {
+  try {
+    const res = await apiClient.delete(`/products/${id}`);
+    let products = getStoredProducts();
+    products = products.filter(p => p.id !== id);
+    saveStoredProducts(products);
+    return res;
+  } catch (err) {
+    console.warn('[BrewSpace] Backend offline, menghapus produk secara lokal:', err.message);
+    let products = getStoredProducts();
+    products = products.filter(p => p.id !== id);
+    saveStoredProducts(products);
+    return { success: true, message: 'Produk berhasil dihapus' };
   }
 };
 

@@ -39,11 +39,11 @@ export const Orders = () => {
       <Navbar />
 
       <main className="page-content">
-        <div style={{ padding: '16px 18px 8px 18px' }}>
-          <h1 style={{ fontFamily: 'var(--font-serif)', fontSize: '1.4rem', color: 'var(--primary)', fontWeight: 700 }}>
+        <div className="page-title-section">
+          <h1 style={{ fontFamily: 'var(--font-serif)', fontSize: '1.5rem', color: 'var(--primary)', fontWeight: 700 }}>
             Riwayat Pesanan
           </h1>
-          <p style={{ fontSize: '0.82rem', color: 'var(--text-muted)' }}>
+          <p style={{ fontSize: '0.86rem', color: 'var(--text-muted)' }}>
             Pantau status pemrosesan dan riwayat pembelian kopi Anda di BrewSpace.
           </p>
         </div>
@@ -61,87 +61,76 @@ export const Orders = () => {
             actionLink="/explore"
           />
         ) : (
-          <div style={{ padding: '8px 18px 24px 18px', display: 'flex', flexDirection: 'column', gap: '14px' }}>
-            {orders.map((order) => {
-              const itemsCount = order.order_items?.reduce((s, i) => s + i.quantity, 0) || 1;
-              const firstItemName = order.order_items?.[0]?.product_name || 'Koleksi Kopi BrewSpace';
-              const moreItems = order.order_items?.length > 1 ? `+${order.order_items.length - 1} produk lainnya` : '';
+          <div className="orders-container">
+            <div className="orders-list-grid">
+              {orders.map((order) => {
+                const firstItemName = order.order_items?.[0]?.product_name || 'Koleksi Kopi BrewSpace';
+                const moreItems = order.order_items?.length > 1 ? `+${order.order_items.length - 1} produk lainnya` : '';
 
-              return (
-                <Link
-                  key={order.id}
-                  to={`/orders/${order.id}`}
-                  style={{
-                    backgroundColor: 'var(--surface)',
-                    borderRadius: 'var(--radius-lg)',
-                    padding: '16px',
-                    border: '1px solid var(--border-light)',
-                    boxShadow: 'var(--shadow-sm)',
-                    textDecoration: 'none',
-                    color: 'inherit',
-                    display: 'flex',
-                    flexDirection: 'column',
-                    gap: '10px',
-                    transition: 'var(--transition-fast)'
-                  }}
-                >
-                  {/* Top Bar: Order ID & Status Badge */}
-                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                      <Package size={16} color="var(--primary)" />
-                      <span style={{ fontSize: '0.88rem', fontWeight: 700, color: 'var(--primary)' }}>
-                        {order.order_number}
+                return (
+                  <Link
+                    key={order.id}
+                    to={`/orders/${order.id}`}
+                    className="order-card-link"
+                  >
+                    {/* Top Bar: Order ID & Status Badge */}
+                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                        <Package size={16} color="var(--primary)" />
+                        <span style={{ fontSize: '0.9rem', fontWeight: 700, color: 'var(--primary)' }}>
+                          {order.order_number}
+                        </span>
+                      </div>
+                      <span className={`status-badge ${order.status}`}>
+                        ● {order.status}
                       </span>
                     </div>
-                    <span className={`status-badge ${order.status}`}>
-                      ● {order.status}
-                    </span>
-                  </div>
 
-                  {/* Date */}
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '5px', fontSize: '0.75rem', color: 'var(--text-muted)' }}>
-                    <Calendar size={13} />
-                    <span>{formatDate(order.created_at)}</span>
-                  </div>
+                    {/* Date */}
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '5px', fontSize: '0.78rem', color: 'var(--text-muted)' }}>
+                      <Calendar size={13} />
+                      <span>{formatDate(order.created_at)}</span>
+                    </div>
 
-                  {/* Summary Product snippet */}
-                  <div style={{
-                    backgroundColor: 'var(--surface-subtle)',
-                    borderRadius: 'var(--radius-md)',
-                    padding: '8px 12px',
-                    fontSize: '0.82rem'
-                  }}>
-                    <p style={{ fontWeight: 600, color: 'var(--text-main)' }}>
-                      {firstItemName}
-                    </p>
-                    {moreItems && (
-                      <p style={{ fontSize: '0.72rem', color: 'var(--text-muted)', marginTop: '2px' }}>
-                        {moreItems}
+                    {/* Summary Product snippet */}
+                    <div style={{
+                      backgroundColor: 'var(--surface-subtle)',
+                      borderRadius: 'var(--radius-md)',
+                      padding: '10px 12px',
+                      fontSize: '0.84rem'
+                    }}>
+                      <p style={{ fontWeight: 600, color: 'var(--text-main)' }}>
+                        {firstItemName}
                       </p>
-                    )}
-                  </div>
+                      {moreItems && (
+                        <p style={{ fontSize: '0.74rem', color: 'var(--text-muted)', marginTop: '2px' }}>
+                          {moreItems}
+                        </p>
+                      )}
+                    </div>
 
-                  {/* Footer: Total & Arrow */}
-                  <div style={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'space-between',
-                    borderTop: '1px dashed var(--border-light)',
-                    paddingTop: '8px',
-                    marginTop: '2px'
-                  }}>
-                    <div>
-                      <span style={{ fontSize: '0.72rem', color: 'var(--text-muted)', display: 'block' }}>Total Belanja</span>
-                      <strong style={{ fontSize: '1rem', color: 'var(--primary)' }}>{formatRupiah(order.total_amount)}</strong>
+                    {/* Footer: Total & Arrow */}
+                    <div style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'space-between',
+                      borderTop: '1px dashed var(--border-light)',
+                      paddingTop: '10px',
+                      marginTop: '4px'
+                    }}>
+                      <div>
+                        <span style={{ fontSize: '0.74rem', color: 'var(--text-muted)', display: 'block' }}>Total Belanja</span>
+                        <strong style={{ fontSize: '1.05rem', color: 'var(--primary)' }}>{formatRupiah(order.total_amount)}</strong>
+                      </div>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '4px', fontSize: '0.84rem', fontWeight: 600, color: 'var(--secondary)' }}>
+                        <span>Rincian</span>
+                        <ChevronRight size={16} />
+                      </div>
                     </div>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '2px', fontSize: '0.8rem', fontWeight: 600, color: 'var(--secondary)' }}>
-                      <span>Rincian</span>
-                      <ChevronRight size={16} />
-                    </div>
-                  </div>
-                </Link>
-              );
-            })}
+                  </Link>
+                );
+              })}
+            </div>
           </div>
         )}
       </main>

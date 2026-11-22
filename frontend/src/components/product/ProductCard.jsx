@@ -1,15 +1,12 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Star, Heart, Plus } from 'lucide-react';
+import { Star, Heart } from 'lucide-react';
 import { formatRupiah } from '../../config/constants';
 import { addFavorite, removeFavorite } from '../../services/api';
-import { useCart } from '../../context/CartContext';
 
 export const ProductCard = ({ product, isFavoriteInitial = false, onFavoriteToggle }) => {
   const [isFav, setIsFav] = useState(isFavoriteInitial);
   const [favLoading, setFavLoading] = useState(false);
-  const { addItem } = useCart();
-  const [addedAnim, setAddedAnim] = useState(false);
 
   const handleToggleFavorite = async (e) => {
     e.preventDefault();
@@ -30,18 +27,6 @@ export const ProductCard = ({ product, isFavoriteInitial = false, onFavoriteTogg
       console.error('Error toggle favorite:', err);
     } finally {
       setFavLoading(false);
-    }
-  };
-
-  const handleQuickAdd = async (e) => {
-    e.preventDefault();
-    e.stopPropagation();
-    try {
-      await addItem(product.id, 1, 'Biji Utuh');
-      setAddedAnim(true);
-      setTimeout(() => setAddedAnim(false), 1200);
-    } catch (err) {
-      console.error('Error quick add:', err);
     }
   };
 
@@ -81,18 +66,6 @@ export const ProductCard = ({ product, isFavoriteInitial = false, onFavoriteTogg
 
         <div className="product-price-row">
           <span className="product-price">{formatRupiah(product.price)}</span>
-          <button
-            className="btn-add-mini"
-            onClick={handleQuickAdd}
-            aria-label="Tambah ke keranjang"
-            title="Tambah ke keranjang"
-            style={{
-              backgroundColor: addedAnim ? 'var(--primary)' : 'var(--surface-alt)',
-              color: addedAnim ? '#FFFFFF' : 'var(--primary)'
-            }}
-          >
-            <Plus size={16} strokeWidth={2.5} />
-          </button>
         </div>
       </div>
     </Link>

@@ -45,11 +45,11 @@ export const Favorites = () => {
       <Navbar />
 
       <main className="page-content">
-        <div style={{ padding: '16px 18px 8px 18px' }}>
-          <h1 style={{ fontFamily: 'var(--font-serif)', fontSize: '1.4rem', color: 'var(--primary)', fontWeight: 700 }}>
+        <div className="page-title-section">
+          <h1 style={{ fontFamily: 'var(--font-serif)', fontSize: '1.5rem', color: 'var(--primary)', fontWeight: 700 }}>
             Kopi Favorit Saya
           </h1>
-          <p style={{ fontSize: '0.82rem', color: 'var(--text-muted)' }}>
+          <p style={{ fontSize: '0.86rem', color: 'var(--text-muted)' }}>
             Daftar biji dan minuman kopi pilihan yang telah Anda simpan.
           </p>
         </div>

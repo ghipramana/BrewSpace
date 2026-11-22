@@ -273,7 +273,7 @@ export const Checkout = () => {
                     <div>
                       <span style={{ fontWeight: 600 }}>{item.product_name}</span>
                       <span style={{ fontSize: '0.74rem', color: 'var(--text-muted)', display: 'block' }}>
-                        {item.quantity}x • {item.grind_option || 'Biji Utuh'}
+                        {item.quantity}x
                       </span>
                     </div>
                     <span style={{ fontWeight: 700, color: 'var(--primary)' }}>

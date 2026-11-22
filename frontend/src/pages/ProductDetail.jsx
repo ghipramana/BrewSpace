@@ -7,7 +7,7 @@ import {
 import { LoadingState } from '../components/common/LoadingState';
 import { ErrorState } from '../components/common/ErrorState';
 import { getProductById, addFavorite, removeFavorite } from '../services/api';
-import { formatRupiah, GRIND_OPTIONS } from '../config/constants';
+import { formatRupiah } from '../config/constants';
 import { useCart } from '../context/CartContext';
 import { Navbar } from '../components/common/Navbar';
 
@@ -20,7 +20,6 @@ export const ProductDetail = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  const [selectedGrind, setSelectedGrind] = useState('Biji Utuh');
   const [quantity, setQuantity] = useState(1);
   const [isFav, setIsFav] = useState(false);
   const [addedToast, setAddedToast] = useState(false);
@@ -63,7 +62,7 @@ export const ProductDetail = () => {
 
   const handleAddToCart = async () => {
     try {
-      await addItem(product.id, quantity, selectedGrind);
+      await addItem(product.id, quantity);
       setAddedToast(true);
       setTimeout(() => setAddedToast(false), 2000);
     } catch (err) {
@@ -79,7 +78,7 @@ export const ProductDetail = () => {
           product_name: product.name,
           price: product.price,
           quantity: quantity,
-          grind_option: selectedGrind,
+          grind_option: 'Biji Utuh',
           image_url: product.image_url
         }
       }
@@ -214,26 +213,6 @@ export const ProductDetail = () => {
               <h3 className="option-group-title" style={{ marginTop: 0 }}>Tentang Kopi Ini</h3>
               <p style={{ fontSize: '0.9rem', color: 'var(--text-main)', lineHeight: 1.65 }}>
                 {product.description}
-              </p>
-            </div>
-
-            {/* Grind Options Selector */}
-            <div style={{ marginTop: '18px' }}>
-              <h3 className="option-group-title">Pilihan Gilingan (Grind Size)</h3>
-              <div className="grind-options-grid">
-                {GRIND_OPTIONS.map((opt) => (
-                  <button
-                    key={opt.id}
-                    type="button"
-                    className={`grind-option-btn ${selectedGrind === opt.id ? 'active' : ''}`}
-                    onClick={() => setSelectedGrind(opt.id)}
-                  >
-                    <div>{opt.label}</div>
-                  </button>
-                ))}
-              </div>
-              <p style={{ fontSize: '0.76rem', color: 'var(--text-muted)', marginTop: '-8px', fontStyle: 'italic' }}>
-                💡 {GRIND_OPTIONS.find(o => o.id === selectedGrind)?.desc}
               </p>
             </div>
 
