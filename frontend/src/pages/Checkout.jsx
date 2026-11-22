@@ -2,13 +2,14 @@ import React, { useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { 
   ArrowLeft, MapPin, Phone, CreditCard, ShieldCheck, 
-  WifiOff, CheckCircle2, AlertTriangle 
+  WifiOff, CheckCircle2, AlertTriangle, ArrowRight 
 } from 'lucide-react';
 import { useCart } from '../context/CartContext';
 import { useAuth } from '../context/AuthContext';
 import { useNetworkStatus } from '../hooks/useNetworkStatus';
 import { checkoutOrder } from '../services/api';
 import { formatRupiah, PAYMENT_METHODS } from '../config/constants';
+import { Navbar } from '../components/common/Navbar';
 
 export const Checkout = () => {
   const navigate = useNavigate();
@@ -73,9 +74,7 @@ export const Checkout = () => {
       const res = await checkoutOrder(payload);
 
       if (res.success && res.data) {
-        // Refresh keranjang di background jika checkout dari cart
         if (!directItem) refreshCart();
-        // Arahkan ke detail order baru
         navigate(`/orders/${res.data.id}`, {
           state: { isNewOrder: true }
         });
@@ -90,6 +89,11 @@ export const Checkout = () => {
 
   return (
     <div className="app-container">
+      {/* Desktop Navbar */}
+      <div className="desktop-only" style={{ width: '100%' }}>
+        <Navbar />
+      </div>
+
       {/* Top Header */}
       <div className="page-header-nav">
         <button onClick={() => navigate(-1)} className="icon-btn" aria-label="Kembali">
@@ -99,7 +103,7 @@ export const Checkout = () => {
         <div style={{ width: '40px' }} />
       </div>
 
-      <main className="page-content-standalone" style={{ padding: '16px 18px 120px 18px' }}>
+      <main className="page-content-standalone">
         {/* PWA Offline Guard Banner */}
         {!isOnline && (
           <div style={{
@@ -138,167 +142,176 @@ export const Checkout = () => {
           </div>
         )}
 
-        <form onSubmit={handleSubmitOrder}>
-          {/* Section: Alamat Pengiriman */}
-          <div style={{
-            backgroundColor: 'var(--surface)',
-            borderRadius: 'var(--radius-lg)',
-            padding: '16px',
-            border: '1px solid var(--border-light)',
-            marginBottom: '14px',
-            boxShadow: 'var(--shadow-xs)'
-          }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '12px' }}>
-              <MapPin size={18} color="var(--primary)" />
-              <h3 style={{ fontSize: '0.94rem', fontWeight: 700, color: 'var(--primary)' }}>
-                Tujuan Pengiriman
-              </h3>
+        <form onSubmit={handleSubmitOrder} className="checkout-grid-container">
+          {/* Left Column: Delivery & Payment Details */}
+          <div className="checkout-form-column">
+            {/* Section: Alamat Pengiriman */}
+            <div style={{
+              backgroundColor: 'var(--surface)',
+              borderRadius: 'var(--radius-lg)',
+              padding: '18px',
+              border: '1px solid var(--border-light)',
+              marginBottom: '16px',
+              boxShadow: 'var(--shadow-xs)'
+            }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '14px' }}>
+                <MapPin size={18} color="var(--primary)" />
+                <h3 style={{ fontSize: '0.98rem', fontWeight: 700, color: 'var(--primary)' }}>
+                  Tujuan Pengiriman
+                </h3>
+              </div>
+
+              <div className="form-group">
+                <label className="form-label">Nomor Telepon Penerima</label>
+                <input
+                  type="tel"
+                  className="form-input"
+                  placeholder="Contoh: 081234567890"
+                  value={shippingPhone}
+                  onChange={(e) => setShippingPhone(e.target.value)}
+                  required
+                />
+              </div>
+
+              <div className="form-group" style={{ marginBottom: 0 }}>
+                <label className="form-label">Alamat Lengkap</label>
+                <textarea
+                  className="form-textarea"
+                  rows={3}
+                  placeholder="Nama jalan, nomor rumah, RT/RW, kecamatan, kota..."
+                  value={shippingAddress}
+                  onChange={(e) => setShippingAddress(e.target.value)}
+                  required
+                />
+              </div>
             </div>
 
-            <div className="form-group">
-              <label className="form-label">Nomor Telepon Penerima</label>
-              <input
-                type="tel"
-                className="form-input"
-                placeholder="Contoh: 081234567890"
-                value={shippingPhone}
-                onChange={(e) => setShippingPhone(e.target.value)}
-                required
-              />
+            {/* Section: Catatan Pesanan */}
+            <div style={{
+              backgroundColor: 'var(--surface)',
+              borderRadius: 'var(--radius-lg)',
+              padding: '18px',
+              border: '1px solid var(--border-light)',
+              marginBottom: '16px',
+              boxShadow: 'var(--shadow-xs)'
+            }}>
+              <div className="form-group" style={{ marginBottom: 0 }}>
+                <label className="form-label">Catatan untuk Barista (Opsional)</label>
+                <input
+                  type="text"
+                  className="form-input"
+                  placeholder="Contoh: Tolong packing kayu / jangan terlalu manis"
+                  value={notes}
+                  onChange={(e) => setNotes(e.target.value)}
+                />
+              </div>
             </div>
 
-            <div className="form-group" style={{ marginBottom: 0 }}>
-              <label className="form-label">Alamat Lengkap</label>
-              <textarea
-                className="form-textarea"
-                rows={3}
-                placeholder="Nama jalan, nomor rumah, RT/RW, kecamatan, kota..."
-                value={shippingAddress}
-                onChange={(e) => setShippingAddress(e.target.value)}
-                required
-              />
+            {/* Section: Metode Pembayaran (Simulasi) */}
+            <div style={{
+              backgroundColor: 'var(--surface)',
+              borderRadius: 'var(--radius-lg)',
+              padding: '18px',
+              border: '1px solid var(--border-light)',
+              marginBottom: '16px',
+              boxShadow: 'var(--shadow-xs)'
+            }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '14px' }}>
+                <CreditCard size={18} color="var(--primary)" />
+                <h3 style={{ fontSize: '0.98rem', fontWeight: 700, color: 'var(--primary)' }}>
+                  Metode Pembayaran (Simulasi)
+                </h3>
+              </div>
+
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                {PAYMENT_METHODS.map((pm) => (
+                  <label
+                    key={pm.id}
+                    style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '12px',
+                      padding: '12px 14px',
+                      borderRadius: 'var(--radius-md)',
+                      border: paymentMethod === pm.id ? '2px solid var(--primary)' : '1px solid var(--border-light)',
+                      backgroundColor: paymentMethod === pm.id ? 'var(--surface-subtle)' : 'transparent',
+                      cursor: 'pointer',
+                      transition: 'var(--transition-fast)'
+                    }}
+                  >
+                    <input
+                      type="radio"
+                      name="payment_method"
+                      value={pm.id}
+                      checked={paymentMethod === pm.id}
+                      onChange={(e) => setPaymentMethod(e.target.value)}
+                    />
+                    <div>
+                      <strong style={{ fontSize: '0.86rem', color: 'var(--text-main)', display: 'block' }}>
+                        {pm.name}
+                      </strong>
+                      <span style={{ fontSize: '0.74rem', color: 'var(--text-muted)' }}>
+                        {pm.desc}
+                      </span>
+                    </div>
+                  </label>
+                ))}
+              </div>
             </div>
           </div>
 
-          {/* Section: Catatan Pesanan */}
-          <div style={{
-            backgroundColor: 'var(--surface)',
-            borderRadius: 'var(--radius-lg)',
-            padding: '16px',
-            border: '1px solid var(--border-light)',
-            marginBottom: '14px',
-            boxShadow: 'var(--shadow-xs)'
-          }}>
-            <div className="form-group" style={{ marginBottom: 0 }}>
-              <label className="form-label">Catatan untuk Barista (Opsional)</label>
-              <input
-                type="text"
-                className="form-input"
-                placeholder="Contoh: Tolong packing kayu / jangan terlalu manis"
-                value={notes}
-                onChange={(e) => setNotes(e.target.value)}
-              />
-            </div>
-          </div>
-
-          {/* Section: Metode Pembayaran (Simulasi) */}
-          <div style={{
-            backgroundColor: 'var(--surface)',
-            borderRadius: 'var(--radius-lg)',
-            padding: '16px',
-            border: '1px solid var(--border-light)',
-            marginBottom: '14px',
-            boxShadow: 'var(--shadow-xs)'
-          }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '12px' }}>
-              <CreditCard size={18} color="var(--primary)" />
-              <h3 style={{ fontSize: '0.94rem', fontWeight: 700, color: 'var(--primary)' }}>
-                Metode Pembayaran (Simulasi)
+          {/* Right Column: Order Review Card */}
+          <div className="checkout-summary-column">
+            <div className="checkout-review-card">
+              <h3 style={{ fontSize: '1rem', fontWeight: 700, color: 'var(--primary)', marginBottom: '14px' }}>
+                Rincian Pesanan ({items.length} jenis)
               </h3>
-            </div>
 
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-              {PAYMENT_METHODS.map((pm) => (
-                <label
-                  key={pm.id}
-                  style={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: '12px',
-                    padding: '10px 12px',
-                    borderRadius: 'var(--radius-md)',
-                    border: paymentMethod === pm.id ? '2px solid var(--primary)' : '1px solid var(--border-light)',
-                    backgroundColor: paymentMethod === pm.id ? 'var(--surface-subtle)' : 'transparent',
-                    cursor: 'pointer'
-                  }}
-                >
-                  <input
-                    type="radio"
-                    name="payment_method"
-                    value={pm.id}
-                    checked={paymentMethod === pm.id}
-                    onChange={(e) => setPaymentMethod(e.target.value)}
-                  />
-                  <div>
-                    <strong style={{ fontSize: '0.84rem', color: 'var(--text-main)', display: 'block' }}>
-                      {pm.name}
-                    </strong>
-                    <span style={{ fontSize: '0.72rem', color: 'var(--text-muted)' }}>
-                      {pm.desc}
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+                {items.map((item, idx) => (
+                  <div key={idx} style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.84rem' }}>
+                    <div>
+                      <span style={{ fontWeight: 600 }}>{item.product_name}</span>
+                      <span style={{ fontSize: '0.74rem', color: 'var(--text-muted)', display: 'block' }}>
+                        {item.quantity}x • {item.grind_option || 'Biji Utuh'}
+                      </span>
+                    </div>
+                    <span style={{ fontWeight: 700, color: 'var(--primary)' }}>
+                      {formatRupiah(item.price * item.quantity)}
                     </span>
                   </div>
-                </label>
-              ))}
-            </div>
-          </div>
+                ))}
+              </div>
 
-          {/* Section: Ringkasan Item Pesanan */}
-          <div style={{
-            backgroundColor: 'var(--surface)',
-            borderRadius: 'var(--radius-lg)',
-            padding: '16px',
-            border: '1px solid var(--border-light)',
-            marginBottom: '14px',
-            boxShadow: 'var(--shadow-xs)'
-          }}>
-            <h3 style={{ fontSize: '0.94rem', fontWeight: 700, color: 'var(--primary)', marginBottom: '10px' }}>
-              Rincian Item ({items.length} jenis)
-            </h3>
-
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-              {items.map((item, idx) => (
-                <div key={idx} style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.82rem' }}>
-                  <div>
-                    <span style={{ fontWeight: 600 }}>{item.product_name}</span>
-                    <span style={{ fontSize: '0.72rem', color: 'var(--text-muted)', display: 'block' }}>
-                      {item.quantity}x • {item.grind_option || 'Biji Utuh'}
-                    </span>
-                  </div>
-                  <span style={{ fontWeight: 700, color: 'var(--primary)' }}>
-                    {formatRupiah(item.price * item.quantity)}
-                  </span>
+              <div style={{ borderTop: '1px dashed var(--border-light)', marginTop: '14px', paddingTop: '12px' }}>
+                <div className="summary-row">
+                  <span>Subtotal Kopi</span>
+                  <span>{formatRupiah(subtotal)}</span>
                 </div>
-              ))}
-            </div>
+                <div className="summary-row">
+                  <span>Ongkos Kirim</span>
+                  <span>{formatRupiah(shippingCost)}</span>
+                </div>
+                <div className="summary-row total">
+                  <span>Total Tagihan</span>
+                  <span>{formatRupiah(grandTotal)}</span>
+                </div>
+              </div>
 
-            <div style={{ borderTop: '1px dashed var(--border-light)', marginTop: '12px', paddingTop: '10px' }}>
-              <div className="summary-row">
-                <span>Subtotal Kopi</span>
-                <span>{formatRupiah(subtotal)}</span>
-              </div>
-              <div className="summary-row">
-                <span>Ongkos Kirim</span>
-                <span>{formatRupiah(shippingCost)}</span>
-              </div>
-              <div className="summary-row total">
-                <span>Total Tagihan</span>
-                <span>{formatRupiah(grandTotal)}</span>
-              </div>
+              {/* Desktop Submit Button */}
+              <button
+                type="submit"
+                disabled={submitting || !isOnline}
+                className="btn btn-primary btn-block desktop-only"
+                style={{ marginTop: '20px', padding: '14px' }}
+              >
+                {submitting ? 'Memproses Pesanan...' : !isOnline ? 'Offline' : 'Konfirmasi & Bayar Sekarang'}
+              </button>
             </div>
           </div>
 
-          {/* Bottom Confirmation Bar */}
-          <footer className="detail-bottom-bar">
+          {/* Bottom Confirmation Bar (Mobile-only) */}
+          <footer className="detail-bottom-bar mobile-only">
             <div style={{ flex: 1 }}>
               <span style={{ fontSize: '0.72rem', color: 'var(--text-muted)', display: 'block' }}>Total Pembayaran</span>
               <span style={{ fontSize: '1.1rem', fontWeight: 800, color: 'var(--primary)' }}>

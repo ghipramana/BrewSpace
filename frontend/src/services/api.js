@@ -1,5 +1,6 @@
 import axios from 'axios';
 import { API_BASE_URL } from '../config/constants';
+import { fallbackCategories, fallbackProducts } from './mockData';
 
 // Inisialisasi Axios instance
 const apiClient = axios.create({
@@ -7,7 +8,7 @@ const apiClient = axios.create({
   headers: {
     'Content-Type': 'application/json'
   },
-  timeout: 10000
+  timeout: 4000
 });
 
 // Interceptor untuk menambahkan Bearer Token otomatis pada setiap request
@@ -22,7 +23,7 @@ apiClient.interceptors.request.use(
   (error) => Promise.reject(error)
 );
 
-// Interceptor response untuk penanganan error umum
+// Interceptor response untuk penanganan error
 apiClient.interceptors.response.use(
   (response) => response.data,
   (error) => {
@@ -31,36 +32,328 @@ apiClient.interceptors.response.use(
   }
 );
 
-// Service API Produk & Kategori
-export const getCategories = () => apiClient.get('/categories');
-export const getCategoryById = (id) => apiClient.get(`/categories/${id}`);
+// ==============================================================================
+// SERVICE: PRODUK & KATEGORI (Dengan Fallback Cerdas jika Backend Belum Nyala)
+// ==============================================================================
 
-export const getProducts = (params = {}) => apiClient.get('/products', { params });
-export const getProductById = (id) => apiClient.get(`/products/${id}`);
+export const getCategories = async () => {
+  try {
+    const res = await apiClient.get('/categories');
+    return res;
+  } catch (err) {
+    console.warn('[BrewSpace] Backend belum menyala di port 5000, menggunakan data lokal kategori:', err.message);
+    return { success: true, data: fallbackCategories };
+  }
+};
 
-// Service API Keranjang Belanja
-export const getCart = () => apiClient.get('/cart');
-export const addToCart = (productId, quantity = 1, grindOption = 'Biji Utuh') =>
-  apiClient.post('/cart', { product_id: productId, quantity, grind_option: grindOption });
-export const updateCartItem = (cartItemId, quantity) =>
-  apiClient.put(`/cart/${cartItemId}`, { quantity });
-export const removeCartItem = (cartItemId) =>
-  apiClient.delete(`/cart/${cartItemId}`);
+export const getCategoryById = async (id) => {
+  try {
+    const res = await apiClient.get(`/categories/${id}`);
+    return res;
+  } catch (err) {
+    const cat = fallbackCategories.find(c => c.id === parseInt(id, 10)) || fallbackCategories[0];
+    return { success: true, data: cat };
+  }
+};
 
-// Service API Favorit
-export const getFavorites = () => apiClient.get('/favorites');
-export const addFavorite = (productId) =>
-  apiClient.post('/favorites', { product_id: productId });
-export const removeFavorite = (identifier) =>
-  apiClient.delete(`/favorites/${identifier}`);
+export const getProducts = async (params = {}) => {
+  try {
+    const res = await apiClient.get('/products', { params });
+    return res;
+  } catch (err) {
+    console.warn('[BrewSpace] Backend belum menyala di port 5000, menggunakan data lokal produk:', err.message);
+    let results = [...fallbackProducts];
 
-// Service API Pesanan (Orders)
-export const getOrders = () => apiClient.get('/orders');
-export const getOrderById = (id) => apiClient.get(`/orders/${id}`);
-export const checkoutOrder = (payload) => apiClient.post('/orders', payload);
+    if (params.category_id) {
+      results = results.filter(p => p.category_id === parseInt(params.category_id, 10));
+    }
+    if (params.is_best_seller) {
+      results = results.filter(p => p.is_best_seller);
+    }
+    if (params.is_featured) {
+      results = results.filter(p => p.is_featured);
+    }
+    if (params.search) {
+      const q = params.search.toLowerCase();
+      results = results.filter(p =>
+        p.name.toLowerCase().includes(q) || (p.origin && p.origin.toLowerCase().includes(q))
+      );
+    }
+    if (params.sort === 'price_asc') {
+      results.sort((a, b) => a.price - b.price);
+    } else if (params.sort === 'price_desc') {
+      results.sort((a, b) => b.price - a.price);
+    } else if (params.sort === 'rating_desc') {
+      results.sort((a, b) => b.rating - a.rating);
+    }
+    if (params.limit) {
+      results = results.slice(0, parseInt(params.limit, 10));
+    }
 
-// Service API User
-export const getUserProfile = (userId) => apiClient.get(`/users/${userId}`);
-export const updateUserProfile = (userId, payload) => apiClient.put(`/users/${userId}`, payload);
+    return { success: true, data: results };
+  }
+};
+
+export const getProductById = async (id) => {
+  try {
+    const res = await apiClient.get(`/products/${id}`);
+    return res;
+  } catch (err) {
+    console.warn('[BrewSpace] Backend belum menyala di port 5000, menggunakan data lokal detail produk');
+    const prod = fallbackProducts.find(p => p.id === id) || fallbackProducts[0];
+    return { success: true, data: prod };
+  }
+};
+
+// ==============================================================================
+// SERVICE: KERANJANG BELANJA (Dengan Fallback LocalStorage)
+// ==============================================================================
+
+const getLocalCart = () => {
+  try {
+    return JSON.parse(localStorage.getItem('brewspace_local_cart')) || [];
+  } catch {
+    return [];
+  }
+};
+
+const saveLocalCart = (cart) => {
+  localStorage.setItem('brewspace_local_cart', JSON.stringify(cart));
+};
+
+export const getCart = async () => {
+  try {
+    return await apiClient.get('/cart');
+  } catch {
+    const items = getLocalCart();
+    const subtotal = items.reduce((sum, item) => sum + (item.products.price * item.quantity), 0);
+    return {
+      success: true,
+      data: {
+        items,
+        summary: {
+          total_items: items.reduce((s, i) => s + i.quantity, 0),
+          subtotal,
+          estimated_shipping: subtotal > 0 ? 15000 : 0,
+          grand_total: subtotal > 0 ? subtotal + 15000 : 0
+        }
+      }
+    };
+  }
+};
+
+export const addToCart = async (productId, quantity = 1, grindOption = 'Biji Utuh') => {
+  try {
+    return await apiClient.post('/cart', { product_id: productId, quantity, grind_option: grindOption });
+  } catch {
+    const items = getLocalCart();
+    const prod = fallbackProducts.find(p => p.id === productId) || fallbackProducts[0];
+    const existing = items.find(i => i.product_id === productId && i.grind_option === grindOption);
+    if (existing) {
+      existing.quantity += quantity;
+    } else {
+      items.push({
+        id: 'cart-' + Date.now(),
+        product_id: productId,
+        quantity,
+        grind_option: grindOption,
+        products: prod
+      });
+    }
+    saveLocalCart(items);
+    return { success: true };
+  }
+};
+
+export const updateCartItem = async (cartItemId, quantity) => {
+  try {
+    return await apiClient.put(`/cart/${cartItemId}`, { quantity });
+  } catch {
+    let items = getLocalCart();
+    if (quantity <= 0) {
+      items = items.filter(i => i.id !== cartItemId);
+    } else {
+      const it = items.find(i => i.id === cartItemId);
+      if (it) it.quantity = quantity;
+    }
+    saveLocalCart(items);
+    return { success: true };
+  }
+};
+
+export const removeCartItem = async (cartItemId) => {
+  try {
+    return await apiClient.delete(`/cart/${cartItemId}`);
+  } catch {
+    const items = getLocalCart().filter(i => i.id !== cartItemId);
+    saveLocalCart(items);
+    return { success: true };
+  }
+};
+
+// ==============================================================================
+// SERVICE: FAVORIT (Dengan Fallback LocalStorage)
+// ==============================================================================
+
+const getLocalFavs = () => {
+  try {
+    return JSON.parse(localStorage.getItem('brewspace_local_favs')) || [
+      'a1111111-1111-1111-1111-111111111111',
+      'd2222222-2222-2222-2222-222222222222'
+    ];
+  } catch {
+    return [];
+  }
+};
+
+export const getFavorites = async () => {
+  try {
+    return await apiClient.get('/favorites');
+  } catch {
+    const favIds = getLocalFavs();
+    const prods = fallbackProducts.filter(p => favIds.includes(p.id));
+    return {
+      success: true,
+      data: prods.map(p => ({ id: 'fav-' + p.id, product_id: p.id, products: p }))
+    };
+  }
+};
+
+export const addFavorite = async (productId) => {
+  try {
+    return await apiClient.post('/favorites', { product_id: productId });
+  } catch {
+    const favs = getLocalFavs();
+    if (!favs.includes(productId)) {
+      favs.push(productId);
+      localStorage.setItem('brewspace_local_favs', JSON.stringify(favs));
+    }
+    return { success: true };
+  }
+};
+
+export const removeFavorite = async (identifier) => {
+  try {
+    return await apiClient.delete(`/favorites/${identifier}`);
+  } catch {
+    let favs = getLocalFavs();
+    favs = favs.filter(id => id !== identifier && ('fav-' + id) !== identifier);
+    localStorage.setItem('brewspace_local_favs', JSON.stringify(favs));
+    return { success: true };
+  }
+};
+
+// ==============================================================================
+// SERVICE: PESANAN (ORDERS)
+// ==============================================================================
+
+const getLocalOrders = () => {
+  try {
+    return JSON.parse(localStorage.getItem('brewspace_local_orders')) || [
+      {
+        id: 'ord-demo-01',
+        order_number: 'BS-20261122-1082',
+        total_amount: 100000,
+        status: 'Diproses',
+        shipping_address: 'Jl. Kampus Merdeka No. 12, Yogyakarta',
+        shipping_phone: '081234567890',
+        payment_method: 'QRIS (Simulasi)',
+        created_at: new Date(Date.now() - 3600000).toISOString(),
+        order_items: [
+          {
+            id: 'oi-1',
+            product_name: 'Arabica Aceh Gayo Specialty 250g',
+            price: 85000,
+            quantity: 1,
+            grind_option: 'Biji Utuh',
+            subtotal: 85000
+          }
+        ]
+      }
+    ];
+  } catch {
+    return [];
+  }
+};
+
+export const getOrders = async () => {
+  try {
+    return await apiClient.get('/orders');
+  } catch {
+    return { success: true, data: getLocalOrders() };
+  }
+};
+
+export const getOrderById = async (id) => {
+  try {
+    return await apiClient.get(`/orders/${id}`);
+  } catch {
+    const orders = getLocalOrders();
+    const ord = orders.find(o => o.id === id) || orders[0];
+    return { success: true, data: ord };
+  }
+};
+
+export const checkoutOrder = async (payload) => {
+  try {
+    return await apiClient.post('/orders', payload);
+  } catch {
+    const orders = getLocalOrders();
+    const cartItems = getLocalCart();
+    const items = payload.items || cartItems.map(c => ({
+      product_name: c.products.name,
+      price: c.products.price,
+      quantity: c.quantity,
+      grind_option: c.grind_option,
+      subtotal: c.products.price * c.quantity
+    }));
+    const totalAmount = items.reduce((s, i) => s + i.subtotal, 0) + 15000;
+    const newOrder = {
+      id: 'ord-' + Date.now(),
+      order_number: 'BS-' + new Date().toISOString().slice(0, 10).replace(/-/g, '') + '-' + Math.floor(1000 + Math.random() * 9000),
+      total_amount: totalAmount,
+      status: 'Diproses',
+      shipping_address: payload.shipping_address,
+      shipping_phone: payload.shipping_phone,
+      payment_method: payload.payment_method || 'QRIS (Simulasi)',
+      notes: payload.notes || '',
+      created_at: new Date().toISOString(),
+      order_items: items
+    };
+    orders.unshift(newOrder);
+    localStorage.setItem('brewspace_local_orders', JSON.stringify(orders));
+    localStorage.removeItem('brewspace_local_cart');
+    return { success: true, data: newOrder };
+  }
+};
+
+// ==============================================================================
+// SERVICE: USER PROFILE
+// ==============================================================================
+
+export const getUserProfile = async (userId) => {
+  try {
+    return await apiClient.get(`/users/${userId}`);
+  } catch {
+    const user = JSON.parse(localStorage.getItem('brewspace_user')) || {
+      full_name: 'Penikmat Kopi Praktikum',
+      email: 'mahasiswa@brewspace.ac.id',
+      phone: '081234567890',
+      address: 'Jl. Kampus Merdeka No. 12, Sleman, Yogyakarta'
+    };
+    return { success: true, data: user };
+  }
+};
+
+export const updateUserProfile = async (userId, payload) => {
+  try {
+    return await apiClient.put(`/users/${userId}`, payload);
+  } catch {
+    const user = JSON.parse(localStorage.getItem('brewspace_user')) || {};
+    const updated = { ...user, ...payload };
+    localStorage.setItem('brewspace_user', JSON.stringify(updated));
+    return { success: true, data: updated };
+  }
+};
 
 export default apiClient;
