@@ -154,11 +154,10 @@ cd BrewSpace
   NODE_ENV=development
   SUPABASE_URL=https://id-project-anda.supabase.co
   SUPABASE_SERVICE_ROLE_KEY=kunci_service_role_rahasia_anda
-  SUPABASE_ANON_KEY=kunci_anon_publik_anda
   CLIENT_URL=http://localhost:5173
   VITE_API_BASE_URL=http://localhost:5000/api
   VITE_SUPABASE_URL=https://id-project-anda.supabase.co
-  VITE_SUPABASE_ANON_KEY=kunci_anon_publik_anda
+  VITE_SUPABASE_PUBLISHABLE_KEY=publishable_key_anda
   ```
 
 ### Langkah 4: Menjalankan Backend (Express.js)
@@ -231,7 +230,7 @@ node test_api.js
 4. Tambahkan **Environment Variable**:
    - `VITE_API_BASE_URL`: `https://brewspace-api.onrender.com/api` (mengarahkan ke URL backend di Render)
    - `VITE_SUPABASE_URL`: `<URL_SUPABASE_ANDA>`
-   - `VITE_SUPABASE_ANON_KEY`: `<ANON_KEY>`
+   - `VITE_SUPABASE_PUBLISHABLE_KEY`: `<PUBLISHABLE_KEY>`
 5. Klik **Deploy**. Aplikasi PWA akan live dengan protokol HTTPS yang siap diinstal di smartphone dosen maupun mahasiswa.
 
 ---
