@@ -4,7 +4,6 @@ const { supabase, isSupabaseConfigured } = require('../config/supabase');
 const fallbackCategories = [
     { id: 1, name: 'Biji Kopi', slug: 'biji-kopi', description: 'Biji kopi sangrai pilihan (whole beans) dari berbagai pegunungan terbaik Indonesia.', icon_name: 'Bean' },
     { id: 2, name: 'Kopi Bubuk', slug: 'kopi-bubuk', description: 'Kopi giling siap seduh dengan tingkat kehalusan presisi untuk manual brew atau tubruk.', icon_name: 'Coffee' },
-    { id: 3, name: 'Kopi Instan & Drip', slug: 'kopi-instan-drip', description: 'Praktis dan higienis, drip bag premium dan bubuk instan siap seduh di mana saja.', icon_name: 'Package' },
     { id: 4, name: 'Minuman Siap Minum', slug: 'minuman-siap-minum', description: 'Cold brew segar dan signature latte kemasan botol siap dinikmati kapan saja.', icon_name: 'CupSoda' }
 ];
 

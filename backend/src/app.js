@@ -1,7 +1,8 @@
 const express = require('express');
 const cors = require('cors');
 const morgan = require('morgan');
-require('dotenv').config();
+const path = require('path');
+require('dotenv').config({ path: path.resolve(__dirname, '../../.env') });
 
 const apiRoutes = require('./routes/apiRoutes');
 const { notFoundHandler, errorHandler } = require('./middleware/errorMiddleware');

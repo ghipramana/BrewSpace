@@ -41,7 +41,13 @@ const getStoredProducts = () => {
     const stored = localStorage.getItem('brewspace_local_products');
     if (stored) {
       const parsed = JSON.parse(stored);
-      if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+      if (Array.isArray(parsed) && parsed.length > 0) {
+        return parsed.filter(product =>
+          Number(product.category_id) !== 3 &&
+          Number(product.categories?.id) !== 3 &&
+          product.categories?.slug !== 'kopi-instan-drip'
+        );
+      }
     }
   } catch {}
   return [...fallbackProducts];

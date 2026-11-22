@@ -147,38 +147,6 @@ let fallbackProducts = [
         categories: { id: 2, name: 'Kopi Bubuk', slug: 'kopi-bubuk' }
     },
     {
-        id: 'c1111111-1111-1111-1111-111111111111',
-        category_id: 3,
-        name: 'Drip Bag Coffee Papua Wamena (Isi 5 Sachet)',
-        origin: 'Lembah Baliem, Papua',
-        roast_level: 'Medium',
-        price: 55000,
-        stock: 30,
-        rating: 4.9,
-        reviews_count: 81,
-        description: 'Satu box berisi 5 kantong drip bag praktis siap seduh. Ditanam secara organik tanpa pestisida di Lembah Baliem Papua. Menghasilkan rasa kopi yang sangat lembut, aroma floral harum semerbak, dan sentuhan rasa kacang almond.',
-        image_url: 'https://images.unsplash.com/photo-1578314675249-a6910f80cc4e?auto=format&fit=crop&w=600&q=80',
-        is_featured: true,
-        is_best_seller: false,
-        categories: { id: 3, name: 'Kopi Instan & Drip', slug: 'kopi-instan-drip' }
-    },
-    {
-        id: 'c2222222-2222-2222-2222-222222222222',
-        category_id: 3,
-        name: 'Drip Bag Mandheling Reserve (Isi 5 Sachet)',
-        origin: 'Mandailing Natal, Sumatera',
-        roast_level: 'Dark',
-        price: 58000,
-        stock: 35,
-        rating: 4.8,
-        reviews_count: 69,
-        description: 'Kemasan drip bag praktis untuk travelling atau ngantor. Rasa earthy khas Mandheling dipadukan aroma cedar wood dan dark molasses yang menenangkan hati hanya dalam 2 menit seduhan air panas.',
-        image_url: 'https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?auto=format&fit=crop&w=600&q=80',
-        is_featured: false,
-        is_best_seller: true,
-        categories: { id: 3, name: 'Kopi Instan & Drip', slug: 'kopi-instan-drip' }
-    },
-    {
         id: 'd1111111-1111-1111-1111-111111111111',
         category_id: 4,
         name: 'Cold Brew Classic Black Bottle 250ml',

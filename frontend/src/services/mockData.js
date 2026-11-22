@@ -2,7 +2,6 @@
 export const fallbackCategories = [
   { id: 1, name: 'Biji Kopi', slug: 'biji-kopi', description: 'Biji kopi sangrai pilihan (whole beans) dari berbagai pegunungan terbaik Indonesia.', icon_name: 'Bean' },
   { id: 2, name: 'Kopi Bubuk', slug: 'kopi-bubuk', description: 'Kopi giling siap seduh dengan tingkat kehalusan presisi untuk manual brew atau tubruk.', icon_name: 'Coffee' },
-  { id: 3, name: 'Kopi Instan & Drip', slug: 'kopi-instan-drip', description: 'Praktis dan higienis, drip bag premium dan bubuk instan siap seduh di mana saja.', icon_name: 'Package' },
   { id: 4, name: 'Minuman Siap Minum', slug: 'minuman-siap-minum', description: 'Cold brew segar dan signature latte kemasan botol siap dinikmati kapan saja.', icon_name: 'CupSoda' }
 ];
 
@@ -118,22 +117,6 @@ export const fallbackProducts = [
     is_featured: false,
     is_best_seller: true,
     categories: { id: 2, name: 'Kopi Bubuk', slug: 'kopi-bubuk' }
-  },
-  {
-    id: 'c1111111-1111-1111-1111-111111111111',
-    category_id: 3,
-    name: 'Drip Bag Coffee Papua Wamena (Isi 5 Sachet)',
-    origin: 'Lembah Baliem, Papua',
-    roast_level: 'Medium',
-    price: 55000,
-    stock: 30,
-    rating: 4.9,
-    reviews_count: 81,
-    description: 'Satu box berisi 5 kantong drip bag praktis siap seduh. Ditanam secara organik tanpa pestisida di Lembah Baliem Papua. Menghasilkan rasa kopi yang sangat lembut, aroma floral harum semerbak, dan sentuhan rasa kacang almond.',
-    image_url: 'https://images.unsplash.com/photo-1578314675249-a6910f80cc4e?auto=format&fit=crop&w=600&q=80',
-    is_featured: true,
-    is_best_seller: false,
-    categories: { id: 3, name: 'Kopi Instan & Drip', slug: 'kopi-instan-drip' }
   },
   {
     id: 'd1111111-1111-1111-1111-111111111111',

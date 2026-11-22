@@ -9,7 +9,7 @@
 ## ☕ 1. Deskripsi Proyek
 **BrewSpace** adalah aplikasi e-commerce khusus produk kopi nusantara berbasis **Progressive Web App (PWA)** dengan antarmuka *mobile-first* bernuansa *specialty coffee shop* yang modern, minimalis, dan elegan.
 
-Aplikasi ini mencakup katalog biji kopi (whole beans), bubuk kopi, drip bag/instan, hingga minuman siap saji (cold brew & latte). Pengguna dapat melakukan pencarian, penyaringan berdasarkan kategori, pengurutan harga, penandaan produk favorit, pengelolaan keranjang dengan varian ukuran gilingan (*grind size*), simulasi proses checkout, pelacakan riwayat pesanan bertingkat, serta pengeditan profil pengguna.
+Aplikasi ini mencakup katalog biji kopi (whole beans), bubuk kopi, hingga minuman siap saji (cold brew & latte). Pengguna dapat melakukan pencarian, penyaringan berdasarkan kategori, pengurutan harga, penandaan produk favorit, pengelolaan keranjang dengan varian ukuran gilingan (*grind size*), simulasi proses checkout, pelacakan riwayat pesanan bertingkat, serta pengeditan profil pengguna.
 
 Aplikasi juga dirancang dengan kapabilitas **offline PWA** berkat Service Worker dan App Shell precaching, sehingga katalog tetap dapat diakses meski koneksi internet terputus.
 
@@ -39,16 +39,16 @@ Aplikasi juga dirancang dengan kapabilitas **offline PWA** berkat Service Worker
 
 ```text
 BrewSpace/
+├── .env.example                    # Template environment backend dan frontend
 ├── .gitignore                      # Mengabaikan .env dan node_modules
 ├── README.md                       # Dokumentasi lengkap proyek
 ├── backend/
-│   ├── .env.example                # Template kredensial backend
 │   ├── package.json                # Dependensi Express, Supabase, CORS, dll
 │   ├── postman_collection.json     # Koleksi Postman pengujian seluruh endpoint API
 │   ├── test_api.js                 # Skrip automated test 15 endpoint API lokal
 │   ├── sql/
 │   │   ├── schema.sql              # DDL: Tabel, trigger auth, RLS, relasi
-│   │   └── seed.sql                # DML: 4 kategori & 14 produk kopi realistis
+│   │   └── seed.sql                # DML: 3 kategori & 12 produk kopi realistis
 │   └── src/
 │       ├── app.js                  # Setup Express, CORS, Morgan, Error handlers
 │       ├── server.js               # Server entry point (Port 5000)
@@ -84,7 +84,6 @@ BrewSpace/
 │           └── responseFormatter.js # Standarisasi format JSON API
 │
 └── frontend/
-    ├── .env.example                # Template environment frontend
     ├── index.html                  # HTML entry point dengan PWA meta tags
     ├── package.json                # Dependensi React, Vite, Axios, Lucide
     ├── vite.config.js              # Konfigurasi build Vite
@@ -149,7 +148,7 @@ cd BrewSpace
    - `service_role` `secret` key
 
 ### Langkah 3: Konfigurasi Environment Variable
-- Buat file `backend/.env` (salin format dari `backend/.env.example`):
+- Buat file `.env` di folder root project (sejajar dengan `README.md`), salin format dari `.env.example`, lalu isi kredensial Supabase:
   ```env
   PORT=5000
   NODE_ENV=development
@@ -157,9 +156,6 @@ cd BrewSpace
   SUPABASE_SERVICE_ROLE_KEY=kunci_service_role_rahasia_anda
   SUPABASE_ANON_KEY=kunci_anon_publik_anda
   CLIENT_URL=http://localhost:5173
-  ```
-- Buat file `frontend/.env` (salin format dari `frontend/.env.example`):
-  ```env
   VITE_API_BASE_URL=http://localhost:5000/api
   VITE_SUPABASE_URL=https://id-project-anda.supabase.co
   VITE_SUPABASE_ANON_KEY=kunci_anon_publik_anda

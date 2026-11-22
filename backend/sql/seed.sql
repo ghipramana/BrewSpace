@@ -1,6 +1,6 @@
 -- ==============================================================================
 -- BrewSpace: Data Awal (Seed Data)
--- Berisi 4 Kategori dan 14 Produk Kopi Indonesia Realistis
+-- Berisi 3 Kategori dan 12 Produk Kopi Indonesia Realistis
 -- ==============================================================================
 
 -- 1. Bersihkan data lama jika ingin reset (opsional, urutan diperhatikan)
@@ -14,11 +14,18 @@
 -- ==============================================================================
 -- INSERT CATEGORIES
 -- ==============================================================================
+-- Hapus kategori dan produk drip bag lama dari seed sebelumnya.
+DELETE FROM public.products
+WHERE id IN (
+    'c1111111-1111-1111-1111-111111111111',
+    'c2222222-2222-2222-2222-222222222222'
+);
+DELETE FROM public.categories WHERE slug = 'kopi-instan-drip';
+
 INSERT INTO public.categories (id, name, slug, description, icon_name)
 VALUES
     (1, 'Biji Kopi', 'biji-kopi', 'Biji kopi sangrai pilihan (whole beans) dari berbagai pegunungan terbaik Indonesia.', 'Bean'),
     (2, 'Kopi Bubuk', 'kopi-bubuk', 'Kopi giling siap seduh dengan tingkat kehalusan presisi untuk manual brew atau tubruk.', 'Coffee'),
-    (3, 'Kopi Instan & Drip', 'kopi-instan-drip', 'Praktis dan higienis, drip bag premium dan bubuk instan siap seduh di mana saja.', 'Package'),
     (4, 'Minuman Siap Minum', 'minuman-siap-minum', 'Cold brew segar dan signature latte kemasan botol siap dinikmati kapan saja.', 'CupSoda')
 ON CONFLICT (id) DO UPDATE 
 SET name = EXCLUDED.name, 
@@ -178,38 +185,6 @@ INSERT INTO public.products (
     'https://images.unsplash.com/photo-1541167760496-1628856ab772?auto=format&fit=crop&w=600&q=80',
     false,
     false
-),
--- 10. Drip Bag Coffee Papua Wamena
-(
-    'c1111111-1111-1111-1111-111111111111',
-    3,
-    'Drip Bag Coffee Papua Wamena (Isi 5 Sachet)',
-    'Lembah Baliem, Papua',
-    'Medium',
-    55000,
-    30,
-    4.9,
-    81,
-    'Satu box berisi 5 kantong drip bag praktis siap seduh. Ditanam secara organik tanpa pestisida di Lembah Baliem Papua. Menghasilkan rasa kopi yang sangat lembut, aroma floral harum semerbak, dan sentuhan rasa kacang almond.',
-    'https://images.unsplash.com/photo-1578314675249-a6910f80cc4e?auto=format&fit=crop&w=600&q=80',
-    true,
-    false
-),
--- 11. Drip Bag Mandheling Reserve
-(
-    'c2222222-2222-2222-2222-222222222222',
-    3,
-    'Drip Bag Mandheling Reserve (Isi 5 Sachet)',
-    'Mandailing Natal, Sumatera',
-    'Dark',
-    58000,
-    35,
-    4.8,
-    69,
-    'Kemasan drip bag praktis untuk travelling atau ngantor. Rasa earthy khas Mandheling dipadukan aroma cedar wood dan dark molasses yang menenangkan hati hanya dalam 2 menit seduhan air panas.',
-    'https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?auto=format&fit=crop&w=600&q=80',
-    false,
-    true
 ),
 -- 12. Cold Brew Classic Black
 (
