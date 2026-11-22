@@ -152,7 +152,7 @@ cd BrewSpace
   ```env
   PORT=5000
   NODE_ENV=development
-  SUPABASE_URL=https://id-project-anda.supabase.co
+  VITE_SUPABASE_URL=https://id-project-anda.supabase.co
   SUPABASE_SERVICE_ROLE_KEY=kunci_service_role_rahasia_anda
   CLIENT_URL=http://localhost:5173
   VITE_API_BASE_URL=http://localhost:5000/api
@@ -214,7 +214,7 @@ node test_api.js
 4. Masukkan **Environment Variables**:
    - `NODE_ENV`: `production`
    - `PORT`: `10000`
-   - `SUPABASE_URL`: `<URL_SUPABASE_ANDA>`
+   - `VITE_SUPABASE_URL`: `<URL_SUPABASE_ANDA>`
    - `SUPABASE_SERVICE_ROLE_KEY`: `<SERVICE_ROLE_KEY>`
    - `CLIENT_URL`: `https://brewspace-frontend.vercel.app` (URL Vercel Anda)
 5. Simpan dan deploy. Anda akan mendapatkan URL backend (misal: `https://brewspace-api.onrender.com`).
