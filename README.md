@@ -204,34 +204,13 @@ node test_api.js
 
 ## 🌐 6. Panduan Deployment Production
 
-### A. Deploy Backend ke Render (Gratis)
-1. Buka [render.com](https://render.com) dan buat **New Web Service**.
-2. Hubungkan repository GitHub Anda.
-3. Konfigurasikan:
-   - **Root Directory**: `backend`
-   - **Build Command**: `npm install`
-   - **Start Command**: `npm start`
-4. Masukkan **Environment Variables**:
-   - `NODE_ENV`: `production`
-   - `PORT`: `10000`
-   - `VITE_SUPABASE_URL`: `<URL_SUPABASE_ANDA>`
-   - `SUPABASE_SERVICE_ROLE_KEY`: `<SERVICE_ROLE_KEY>`
-   - `CLIENT_URL`: `https://brewspace-frontend.vercel.app` (URL Vercel Anda)
-5. Simpan dan deploy. Anda akan mendapatkan URL backend (misal: `https://brewspace-api.onrender.com`).
-
-### B. Deploy Frontend PWA ke Vercel (Gratis)
-1. Buka [vercel.com](https://vercel.com) dan buat **Add New Project**.
-2. Pilih repository GitHub Anda.
-3. Konfigurasikan:
-   - **Root Directory**: `frontend`
-   - **Framework Preset**: `Vite`
-   - **Build Command**: `npm run build`
-   - **Output Directory**: `dist`
-4. Tambahkan **Environment Variable**:
-   - `VITE_API_BASE_URL`: `https://brewspace-api.onrender.com/api` (mengarahkan ke URL backend di Render)
-   - `VITE_SUPABASE_URL`: `<URL_SUPABASE_ANDA>`
-   - `VITE_SUPABASE_PUBLISHABLE_KEY`: `<PUBLISHABLE_KEY>`
-5. Klik **Deploy**. Aplikasi PWA akan live dengan protokol HTTPS yang siap diinstal di smartphone dosen maupun mahasiswa.
+### Deploy Frontend dan Backend dalam Satu Project Vercel
+1. Pastikan repository memiliki `vercel.json` pada folder root.
+2. Di Vercel, impor repository GitHub `ghipramana/BrewSpace` sebagai **multi-service project**.
+3. Gunakan **Root Directory** `./` dan preset **Services**. Frontend memakai alamat `/`, backend memakai `/api`.
+4. Impor variabel dari `.env` root atau masukkan di Vercel. Set `VITE_API_BASE_URL` ke `/api`; isi URL Supabase dan publishable key untuk frontend, serta `SUPABASE_SERVICE_ROLE_KEY` untuk backend.
+5. Jangan mengunggah file `.env` ke GitHub. Variabel yang diawali `VITE_` digunakan frontend, sedangkan service role key hanya untuk backend.
+6. Buat project. Frontend dan API akan tersedia pada satu domain Vercel; PWA bisa diinstal melalui domain tersebut.
 
 ---
 
