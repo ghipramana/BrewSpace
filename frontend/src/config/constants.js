@@ -6,7 +6,10 @@
 export const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || '/api';
 
 // Supabase Public Config
-export const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL || '';
+const configuredSupabaseUrl = import.meta.env.VITE_SUPABASE_URL || '';
+export const SUPABASE_URL = configuredSupabaseUrl
+  .replace(/\/rest\/v1\/?$/i, '')
+  .replace(/\/+$/, '');
 export const SUPABASE_ANON_KEY =
   import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY ||
   import.meta.env.VITE_SUPABASE_ANON_KEY ||
