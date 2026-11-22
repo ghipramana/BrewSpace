@@ -79,6 +79,28 @@ export const authService = {
     return user;
   },
 
+  async updateFullName(fullName) {
+    if (supabaseClient) {
+      const { data, error } = await supabaseClient.auth.updateUser({
+        data: { full_name: fullName }
+      });
+      if (error) throw error;
+      return data.user;
+    }
+
+    const savedUser = localStorage.getItem('brewspace_user');
+    const currentUser = savedUser ? JSON.parse(savedUser) : defaultMockUser;
+    const updatedUser = {
+      ...currentUser,
+      user_metadata: {
+        ...currentUser.user_metadata,
+        full_name: fullName
+      }
+    };
+    localStorage.setItem('brewspace_user', JSON.stringify(updatedUser));
+    return updatedUser;
+  },
+
   /**
    * Keluar / Logout
    */

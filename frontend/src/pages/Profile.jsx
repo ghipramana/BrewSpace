@@ -12,7 +12,7 @@ import { getUserProfile, updateUserProfile } from '../services/api';
 
 export const Profile = () => {
   const navigate = useNavigate();
-  const { user, logout } = useAuth();
+  const { user, logout, updateUserName } = useAuth();
   const { isInstallable, promptInstall } = useInstallPrompt();
 
   const [profile, setProfile] = useState({
@@ -51,6 +51,7 @@ export const Profile = () => {
       setSaveLoading(true);
       await updateUserProfile(user?.id || 'u0000000-0000-0000-0000-000000000001', formData);
       setProfile({ ...formData });
+      await updateUserName(formData.full_name);
       setIsEditing(false);
       setSaveSuccess(true);
       setTimeout(() => setSaveSuccess(false), 2500);

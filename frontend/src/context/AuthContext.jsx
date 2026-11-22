@@ -51,13 +51,19 @@ export const AuthProvider = ({ children }) => {
     return registeredUser;
   };
 
+  const updateUserName = async (fullName) => {
+    const updatedUser = await authService.updateFullName(fullName);
+    setUser(updatedUser);
+    return updatedUser;
+  };
+
   const logout = async () => {
     await authService.signOut();
     setUser(null);
   };
 
   return (
-    <AuthContext.Provider value={{ user, loading, login, register, logout, isAuthenticated: Boolean(user) }}>
+    <AuthContext.Provider value={{ user, loading, login, register, updateUserName, logout, isAuthenticated: Boolean(user) }}>
       {children}
     </AuthContext.Provider>
   );
