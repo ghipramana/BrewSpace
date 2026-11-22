@@ -820,14 +820,6 @@ body {
   margin-bottom: 6px;
 }
 
-.product-rating {
-  display: flex;
-  align-items: center;
-  gap: 3px;
-  color: #E65100;
-  font-weight: 700;
-}
-
 .product-name {
   font-size: 0.92rem;
   font-weight: 700;

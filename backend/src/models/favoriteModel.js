@@ -23,11 +23,8 @@ const FavoriteModel = {
                         id,
                         name,
                         origin,
-                        roast_level,
                         price,
                         stock,
-                        rating,
-                        reviews_count,
                         image_url,
                         category_id,
                         categories (id, name, slug)

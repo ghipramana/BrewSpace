@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Star, Heart } from 'lucide-react';
+import { Heart } from 'lucide-react';
 import { formatRupiah } from '../../config/constants';
 import { addFavorite, removeFavorite } from '../../services/api';
 
@@ -54,10 +54,6 @@ export const ProductCard = ({ product, isFavoriteInitial = false, onFavoriteTogg
       <div className="product-body">
         <div className="product-meta">
           <span>{product.origin ? product.origin.split(',')[0] : 'Nusantara'}</span>
-          <span className="product-rating">
-            <Star size={13} fill="#E65100" strokeWidth={0} />
-            {product.rating || '4.8'}
-          </span>
         </div>
 
         <h3 className="product-name" title={product.name}>

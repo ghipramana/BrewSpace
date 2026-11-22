@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { 
-  ArrowLeft, Heart, Star, ShoppingBag, Plus, Minus, 
-  MapPin, Flame, Check, ArrowRight
+  ArrowLeft, Heart, ShoppingBag, Plus, Minus,
+  MapPin, Check, ArrowRight
 } from 'lucide-react';
 import { LoadingState } from '../components/common/LoadingState';
 import { ErrorState } from '../components/common/ErrorState';
@@ -172,18 +172,12 @@ export const ProductDetail = () => {
               {product.categories?.name && (
                 <span className="badge-tag">{product.categories.name}</span>
               )}
-              {product.roast_level && (
-                <span className="badge-tag" style={{ backgroundColor: '#EFEBE9' }}>
-                  <Flame size={12} style={{ display: 'inline', marginRight: '3px' }} />
-                  {product.roast_level} Roast
-                </span>
-              )}
             </div>
 
             {/* Title */}
             <h1 className="detail-title">{product.name}</h1>
 
-            {/* Origin & Rating */}
+            {/* Origin */}
             <div style={{
               display: 'flex',
               alignItems: 'center',
@@ -195,11 +189,6 @@ export const ProductDetail = () => {
               <div style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
                 <MapPin size={15} color="var(--secondary)" />
                 <span>{product.origin || 'Nusantara Indonesia'}</span>
-              </div>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '4px', fontWeight: 700, color: '#E65100' }}>
-                <Star size={16} fill="#E65100" strokeWidth={0} />
-                <span>{product.rating || '4.9'}</span>
-                <span style={{ fontWeight: 400, color: 'var(--text-muted)' }}>({product.reviews_count || 120})</span>
               </div>
             </div>
 

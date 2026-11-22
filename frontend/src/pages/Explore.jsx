@@ -184,7 +184,6 @@ export const Explore = () => {
               <option value="newest">Terbaru</option>
               <option value="price_asc">Harga: Termurah</option>
               <option value="price_desc">Harga: Termahal</option>
-              <option value="rating_desc">Rating Tertinggi</option>
             </select>
           </div>
         </div>

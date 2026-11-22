@@ -138,7 +138,7 @@ export const Home = () => {
                     <Flame size={20} color="#E65100" />
                     <h3 className="section-title">Paling Terlaris</h3>
                   </div>
-                  <Link to="/explore?sort=rating_desc" className="section-link">
+                  <Link to="/explore" className="section-link">
                     <span>Lihat Semua</span>
                     <ArrowRight size={14} />
                   </Link>

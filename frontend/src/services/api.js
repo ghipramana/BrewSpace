@@ -1,6 +1,37 @@
 import axios from 'axios';
 import { API_BASE_URL } from '../config/constants';
+import { supabaseClient } from './authService';
 import { fallbackCategories, fallbackProducts } from './mockData';
+
+const PRODUCT_IMAGE_BUCKET = 'product-images';
+
+export const uploadProductImage = async (file) => {
+  if (!supabaseClient) {
+    throw new Error('Supabase belum dikonfigurasi. Upload gambar produk memerlukan Supabase Storage.');
+  }
+  if (!file?.type?.startsWith('image/')) {
+    throw new Error('Pilih file gambar (JPG, PNG, WebP, atau format gambar lain).');
+  }
+  if (file.size > 5 * 1024 * 1024) {
+    throw new Error('Ukuran gambar maksimal 5 MB.');
+  }
+
+  const extension = file.name.split('.').pop()?.toLowerCase().replace(/[^a-z0-9]/g, '') || 'jpg';
+  const filePath = `${crypto.randomUUID()}.${extension}`;
+  const { error } = await supabaseClient.storage
+    .from(PRODUCT_IMAGE_BUCKET)
+    .upload(filePath, file, { contentType: file.type, upsert: false });
+
+  if (error) {
+    if (error.message?.toLowerCase().includes('bucket')) {
+      throw new Error('Bucket product-images belum dibuat. Jalankan SQL setup Storage di Supabase terlebih dahulu.');
+    }
+    throw new Error(`Gagal mengunggah gambar: ${error.message}`);
+  }
+
+  const { data } = supabaseClient.storage.from(PRODUCT_IMAGE_BUCKET).getPublicUrl(filePath);
+  return data.publicUrl;
+};
 
 // Inisialisasi Axios instance
 const apiClient = axios.create({
@@ -104,8 +135,6 @@ export const getProducts = async (params = {}) => {
       results.sort((a, b) => a.price - b.price);
     } else if (params.sort === 'price_desc') {
       results.sort((a, b) => b.price - a.price);
-    } else if (params.sort === 'rating_desc') {
-      results.sort((a, b) => b.rating - a.rating);
     }
     if (params.limit) {
       results = results.slice(0, parseInt(params.limit, 10));
@@ -148,11 +177,9 @@ export const createProduct = async (productData) => {
       name: productData.name,
       category_id: Number(productData.category_id || 1),
       origin: productData.origin || 'Nusantara',
-      roast_level: productData.roast_level || 'Medium',
       price: Number(productData.price || 0),
       stock: Number(productData.stock || 0),
       rating: 5.0,
-      reviews_count: 0,
       description: productData.description || '',
       image_url: productData.image_url || 'https://images.unsplash.com/photo-1587734195503-904fca47e0e9?auto=format&fit=crop&w=600&q=80',
       is_featured: Boolean(productData.is_featured),

@@ -4,10 +4,10 @@ import { ArrowLeft, Edit2, Plus, Trash2, X } from 'lucide-react';
 import { Navbar } from '../components/common/Navbar';
 import { BottomNav } from '../components/common/BottomNav';
 import { formatRupiah } from '../config/constants';
-import { createProduct, deleteProduct, getCategories, getProducts, updateProduct } from '../services/api';
+import { createProduct, deleteProduct, getCategories, getProducts, updateProduct, uploadProductImage } from '../services/api';
 
 const emptyForm = {
-  name: '', category_id: '', origin: '', roast_level: 'Medium', price: '', stock: '',
+  name: '', category_id: '', origin: '', price: '', stock: '',
   description: '', image_url: '', is_featured: false, is_best_seller: false
 };
 
@@ -20,6 +20,12 @@ export const AdminProducts = () => {
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState('');
   const [notice, setNotice] = useState('');
+  const [imageFile, setImageFile] = useState(null);
+  const [imagePreview, setImagePreview] = useState('');
+
+  useEffect(() => () => {
+    if (imagePreview.startsWith('blob:')) URL.revokeObjectURL(imagePreview);
+  }, [imagePreview]);
 
   const loadData = useCallback(async () => {
     setLoading(true);
@@ -38,10 +44,15 @@ export const AdminProducts = () => {
   useEffect(() => { loadData(); }, [loadData]);
 
   const startEdit = (product) => {
+    setImageFile(null);
+    setImagePreview('');
     setEditingId(product.id);
+    const editableProductFields = Object.fromEntries(
+      Object.entries(product).filter(([key]) => !['roast_level', 'rating', 'reviews_count'].includes(key))
+    );
     setForm({
       ...emptyForm,
-      ...product,
+      ...editableProductFields,
       category_id: product.category_id || product.categories?.id || '',
       price: product.price ?? '',
       stock: product.stock ?? ''
@@ -53,6 +64,8 @@ export const AdminProducts = () => {
   const resetForm = () => {
     setEditingId(null);
     setForm(emptyForm);
+    setImageFile(null);
+    setImagePreview('');
   };
 
   const handleSubmit = async (event) => {
@@ -60,6 +73,11 @@ export const AdminProducts = () => {
     setSaving(true);
     setError('');
     setNotice('');
+    if (!imageFile && !form.image_url) {
+      setError('Pilih gambar produk terlebih dahulu.');
+      setSaving(false);
+      return;
+    }
     const payload = {
       ...form,
       category_id: Number(form.category_id),
@@ -67,6 +85,7 @@ export const AdminProducts = () => {
       stock: Number(form.stock || 0)
     };
     try {
+      if (imageFile) payload.image_url = await uploadProductImage(imageFile);
       if (editingId) {
         await updateProduct(editingId, payload);
         setNotice('Produk berhasil diperbarui.');
@@ -102,6 +121,24 @@ export const AdminProducts = () => {
     setForm((current) => ({ ...current, [name]: type === 'checkbox' ? checked : value }));
   };
 
+  const handleImageChange = (event) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+    if (!file.type.startsWith('image/')) {
+      setError('Pilih file gambar yang valid.');
+      event.target.value = '';
+      return;
+    }
+    if (file.size > 5 * 1024 * 1024) {
+      setError('Ukuran gambar maksimal 5 MB.');
+      event.target.value = '';
+      return;
+    }
+    setError('');
+    setImageFile(file);
+    setImagePreview(URL.createObjectURL(file));
+  };
+
   return (
     <div className="app-container">
       <Navbar />
@@ -122,11 +159,15 @@ export const AdminProducts = () => {
               <label className="form-group"><span className="form-label">Nama produk *</span><input className="form-input" name="name" value={form.name} onChange={updateField} required /></label>
               <label className="form-group"><span className="form-label">Kategori *</span><select className="form-select" name="category_id" value={form.category_id} onChange={updateField} required><option value="">Pilih kategori</option>{categories.map((category) => <option key={category.id} value={category.id}>{category.name}</option>)}</select></label>
               <label className="form-group"><span className="form-label">Asal kopi</span><input className="form-input" name="origin" value={form.origin} onChange={updateField} placeholder="Contoh: Aceh Gayo" /></label>
-              <label className="form-group"><span className="form-label">Tingkat sangrai</span><select className="form-select" name="roast_level" value={form.roast_level} onChange={updateField}><option>Light</option><option>Light-Medium</option><option>Medium</option><option>Medium-Dark</option><option>Dark</option></select></label>
               <label className="form-group"><span className="form-label">Harga (Rp) *</span><input className="form-input" type="number" name="price" min="0" value={form.price} onChange={updateField} required /></label>
               <label className="form-group"><span className="form-label">Stok</span><input className="form-input" type="number" name="stock" min="0" value={form.stock} onChange={updateField} /></label>
             </div>
-            <label className="form-group" style={{ display: 'block' }}><span className="form-label">URL gambar *</span><input className="form-input" type="url" name="image_url" value={form.image_url} onChange={updateField} placeholder="https://..." required /></label>
+            <div className="form-group" style={{ display: 'block' }}>
+              <label className="form-label" htmlFor="product-image">Foto produk *</label>
+              <input id="product-image" className="form-input" type="file" accept="image/*" onChange={handleImageChange} />
+              <small style={{ display: 'block', color: 'var(--text-muted)', marginTop: 6 }}>Pilih dari galeri Foto atau Files di HP, atau dari komputer. Maksimal 5 MB.{editingId && ' Kosongkan jika ingin memakai foto yang sekarang.'}</small>
+              {(imagePreview || form.image_url) && <img src={imagePreview || form.image_url} alt="Pratinjau foto produk" style={{ display: 'block', width: 140, height: 110, objectFit: 'cover', borderRadius: 12, marginTop: 12 }} />}
+            </div>
             <label className="form-group" style={{ display: 'block' }}><span className="form-label">Deskripsi</span><textarea className="form-textarea" name="description" rows="3" value={form.description} onChange={updateField} /></label>
             <div style={{ display: 'flex', flexWrap: 'wrap', gap: 18, marginBottom: 18 }}>
               <label><input type="checkbox" name="is_featured" checked={Boolean(form.is_featured)} onChange={updateField} /> Produk unggulan</label>

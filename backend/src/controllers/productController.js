@@ -56,7 +56,7 @@ const ProductController = {
      */
     async createProduct(req, res, next) {
         try {
-            const { name, category_id, origin, roast_level, price, stock, description, image_url } = req.body;
+            const { name, category_id, origin, price, stock, description, image_url } = req.body;
 
             if (!name || !price || !image_url) {
                 return errorResponse(res, 'Nama, harga, dan gambar produk wajib diisi', 400);
@@ -66,7 +66,6 @@ const ProductController = {
                 name,
                 category_id: category_id || null,
                 origin: origin || 'Nusantara',
-                roast_level: roast_level || 'Medium',
                 price: Number(price),
                 stock: stock !== undefined ? Number(stock) : 0,
                 description: description || '',

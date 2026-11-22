@@ -34,8 +34,7 @@ const CartModel = {
                         price,
                         stock,
                         image_url,
-                        origin,
-                        roast_level
+                        origin
                     )
                 `)
                 .eq('user_id', userId)
