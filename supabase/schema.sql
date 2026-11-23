@@ -226,5 +226,5 @@ CREATE POLICY "Users insert order items" ON public.order_items
         )
     );
 
--- Catatan: Backend Express menggunakan Supabase Service Role Key sehingga memiliki
--- bypass RLS untuk operasi terpusat dan verifikasi otorisasi via middleware API.
+-- Aplikasi menggunakan Supabase publishable key dari browser.
+-- Operasi tabel tetap dibatasi oleh policy RLS di atas.

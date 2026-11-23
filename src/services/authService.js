@@ -27,9 +27,10 @@ export const authService = {
    * Pendaftaran akun baru
    */
   async signUp(email, password, fullName) {
+    const normalizedEmail = email.trim().toLowerCase();
     if (supabaseClient) {
       const { data, error } = await supabaseClient.auth.signUp({
-        email,
+        email: normalizedEmail,
         password,
         options: {
           data: { full_name: fullName },
@@ -51,7 +52,7 @@ export const authService = {
     // Fallback registration
     const mockUser = {
       id: 'mock-user-' + Date.now(),
-      email,
+      email: normalizedEmail,
       user_metadata: { full_name: fullName }
     };
     localStorage.setItem('brewspace_token', 'demo-token-' + Date.now());
@@ -63,9 +64,10 @@ export const authService = {
    * Masuk dengan email & password
    */
   async signIn(email, password) {
+    const normalizedEmail = email.trim().toLowerCase();
     if (supabaseClient) {
       const { data, error } = await supabaseClient.auth.signInWithPassword({
-        email,
+        email: normalizedEmail,
         password
       });
       if (error) throw error;
@@ -78,7 +80,7 @@ export const authService = {
     // Fallback login
     const user = {
       ...defaultMockUser,
-      email
+      email: normalizedEmail
     };
     localStorage.setItem('brewspace_token', 'demo-token-for-testing');
     localStorage.setItem('brewspace_user', JSON.stringify(user));

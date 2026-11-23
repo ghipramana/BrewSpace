@@ -2,9 +2,6 @@
  * Konstanta konfigurasi frontend BrewSpace
  */
 
-// Base API URL
-export const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || '/api';
-
 // Supabase Public Config
 const configuredSupabaseUrl = import.meta.env.VITE_SUPABASE_URL || '';
 export const SUPABASE_URL = configuredSupabaseUrl
