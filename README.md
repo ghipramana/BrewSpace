@@ -27,6 +27,10 @@ Di Supabase Dashboard, pilih **SQL Editor**. Untuk project Supabase baru, jalank
 
 Jika tabel dan produk BrewSpace sudah ada, jalankan hanya `direct_access.sql` dan `product_images_storage.sql`. Skrip terakhir menyiapkan bucket foto produk dan kebijakan aksesnya.
 
+### Akun admin
+
+Jalankan `supabase/direct_access.sql` untuk membatasi CRUD produk ke admin. Daftarkan akun yang akan dipakai admin di aplikasi, lalu ganti `EMAIL_ADMIN_KAMU` di `supabase/make_admin.sql` dengan email akun itu dan jalankan query tersebut di SQL Editor. Pelanggan yang tidak tercantum di `admin_users` hanya dapat melihat produk.
+
 ## Deploy ke Vercel
 
 Import repository BrewSpace ke Vercel. Gunakan root directory `./`, framework **Vite**, build command `npm run build`, dan output directory `dist`. Tambahkan `VITE_SUPABASE_URL` serta `VITE_SUPABASE_PUBLISHABLE_KEY` di **Settings → Environment Variables**, lalu deploy.

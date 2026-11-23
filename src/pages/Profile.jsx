@@ -12,7 +12,7 @@ import { getUserProfile, updateUserProfile } from '../services/api';
 
 export const Profile = () => {
   const navigate = useNavigate();
-  const { user, logout, updateUserName } = useAuth();
+  const { user, logout, updateUserName, isAdmin } = useAuth();
   const { isInstallable, promptInstall } = useInstallPrompt();
 
   const [profile, setProfile] = useState({
@@ -151,9 +151,11 @@ export const Profile = () => {
             )}
           </div>
 
-          <Link to="/admin/products" className="btn btn-primary" style={{ alignSelf: 'flex-start', marginBottom: 18, textDecoration: 'none' }}>
-            <PackagePlus size={17} /> Kelola Produk
-          </Link>
+          {isAdmin && (
+            <Link to="/admin/products" className="btn btn-primary" style={{ alignSelf: 'flex-start', marginBottom: 18, textDecoration: 'none' }}>
+              <PackagePlus size={17} /> Kelola Produk
+            </Link>
+          )}
 
           {/* Edit Form or Information Details */}
           <div>

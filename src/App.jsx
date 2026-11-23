@@ -1,8 +1,9 @@
 import React from 'react';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
-import { AuthProvider } from './context/AuthContext';
+import { AuthProvider, useAuth } from './context/AuthContext';
 import { CartProvider } from './context/CartContext';
 import { OfflineBadge } from './components/common/OfflineBadge';
+import { LoadingState } from './components/common/LoadingState';
 
 // Halaman-halaman
 import { Home } from './pages/Home';
@@ -18,6 +19,17 @@ import { Login } from './pages/Login';
 import { Register } from './pages/Register';
 import { AdminProducts } from './pages/AdminProducts';
 
+const ProtectedRoute = ({ children, adminOnly = false }) => {
+  const { isAuthenticated, loading, isAdmin, adminLoading } = useAuth();
+
+  if (loading || (adminOnly && adminLoading)) {
+    return <LoadingState message="Memeriksa akses akun..." />;
+  }
+  if (!isAuthenticated) return <Navigate to="/login" replace />;
+  if (adminOnly && !isAdmin) return <Navigate to="/" replace />;
+  return children;
+};
+
 export default function App() {
   return (
     <AuthProvider>
@@ -32,8 +44,8 @@ export default function App() {
             <Route path="/explore" element={<Explore />} />
             <Route path="/favorites" element={<Favorites />} />
             <Route path="/orders" element={<Orders />} />
-            <Route path="/profile" element={<Profile />} />
-            <Route path="/admin/products" element={<AdminProducts />} />
+            <Route path="/profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
+            <Route path="/admin/products" element={<ProtectedRoute adminOnly><AdminProducts /></ProtectedRoute>} />
 
             {/* Halaman Transaksi & Detail Produk (Standalone Page) */}
             <Route path="/products/:id" element={<ProductDetail />} />

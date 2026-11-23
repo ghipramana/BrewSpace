@@ -8,10 +8,30 @@ GRANT SELECT, UPDATE ON public.users TO authenticated;
 GRANT SELECT, INSERT, UPDATE, DELETE ON public.cart_items, public.favorites, public.orders TO authenticated;
 GRANT SELECT, INSERT, DELETE ON public.order_items TO authenticated;
 
+CREATE TABLE IF NOT EXISTS public.admin_users (
+  user_id UUID PRIMARY KEY REFERENCES auth.users(id) ON DELETE CASCADE,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+ALTER TABLE public.admin_users ENABLE ROW LEVEL SECURITY;
+REVOKE ALL ON public.admin_users FROM anon, authenticated;
+GRANT SELECT ON public.admin_users TO authenticated;
+
+DROP POLICY IF EXISTS "Users read own admin role" ON public.admin_users;
+CREATE POLICY "Users read own admin role"
+ON public.admin_users FOR SELECT TO authenticated
+USING (auth.uid() = user_id);
+
+-- Ganti kebijakan CRUD lama yang memperbolehkan semua akun login.
 DROP POLICY IF EXISTS "Authenticated users manage products" ON public.products;
-CREATE POLICY "Authenticated users manage products"
+DROP POLICY IF EXISTS "Admins manage products" ON public.products;
+CREATE POLICY "Admins manage products"
 ON public.products FOR ALL TO authenticated
-USING (true) WITH CHECK (true);
+USING (
+  EXISTS (SELECT 1 FROM public.admin_users WHERE user_id = auth.uid())
+)
+WITH CHECK (
+  EXISTS (SELECT 1 FROM public.admin_users WHERE user_id = auth.uid())
+);
 
 DROP POLICY IF EXISTS "Users insert own profile" ON public.users;
 CREATE POLICY "Users insert own profile"

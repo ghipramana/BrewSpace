@@ -49,12 +49,14 @@ export const Navbar = () => {
           >
             Pesanan
           </NavLink>
-          <NavLink
-            to="/profile"
-            className={({ isActive }) => `desktop-nav-link ${isActive ? 'active' : ''}`}
-          >
-            Profil
-          </NavLink>
+          {!authLoading && isAuthenticated && (
+            <NavLink
+              to="/profile"
+              className={({ isActive }) => `desktop-nav-link ${isActive ? 'active' : ''}`}
+            >
+              Profil
+            </NavLink>
+          )}
         </nav>
 
         {/* Header Right Actions */}

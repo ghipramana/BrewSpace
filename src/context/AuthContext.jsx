@@ -6,6 +6,8 @@ const AuthContext = createContext(null);
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [isAdmin, setIsAdmin] = useState(false);
+  const [adminLoading, setAdminLoading] = useState(true);
 
   useEffect(() => {
     let active = true;
@@ -13,7 +15,10 @@ export const AuthProvider = ({ children }) => {
       let receivedAuthEvent = false;
       const applySession = (session) => {
         if (!active) return;
-        setUser(session?.user || null);
+        const nextUser = session?.user || null;
+        setUser(nextUser);
+        setIsAdmin(false);
+        setAdminLoading(Boolean(nextUser));
         if (session?.access_token) {
           localStorage.setItem('brewspace_token', session.access_token);
         } else {
@@ -44,15 +49,51 @@ export const AuthProvider = ({ children }) => {
     }
 
     authService.getCurrentUser()
-      .then((currentUser) => { if (active) setUser(currentUser); })
+      .then((currentUser) => {
+        if (active) {
+          setUser(currentUser);
+          setIsAdmin(false);
+          setAdminLoading(false);
+        }
+      })
       .catch((error) => console.error('Error init auth:', error))
-      .finally(() => { if (active) setLoading(false); });
+      .finally(() => { if (active) { setLoading(false); setAdminLoading(false); } });
 
     return () => { active = false; };
   }, []);
 
+  useEffect(() => {
+    let active = true;
+    if (!user || !supabaseClient) {
+      setIsAdmin(false);
+      setAdminLoading(false);
+      return () => { active = false; };
+    }
+
+    setAdminLoading(true);
+    supabaseClient
+      .from('admin_users')
+      .select('user_id')
+      .eq('user_id', user.id)
+      .maybeSingle()
+      .then(({ data, error }) => {
+        if (!active) return;
+        if (error) {
+          console.error('Gagal memeriksa akses admin:', error.message);
+          setIsAdmin(false);
+          return;
+        }
+        setIsAdmin(Boolean(data));
+      })
+      .finally(() => { if (active) setAdminLoading(false); });
+
+    return () => { active = false; };
+  }, [user]);
+
   const login = async (email, password) => {
     const loggedUser = await authService.signIn(email, password);
+    setIsAdmin(false);
+    setAdminLoading(true);
     setUser(loggedUser);
     return loggedUser;
   };
@@ -72,11 +113,13 @@ export const AuthProvider = ({ children }) => {
 
   const logout = async () => {
     await authService.signOut();
+    setIsAdmin(false);
+    setAdminLoading(false);
     setUser(null);
   };
 
   return (
-    <AuthContext.Provider value={{ user, loading, login, register, updateUserName, logout, isAuthenticated: Boolean(user) }}>
+    <AuthContext.Provider value={{ user, loading, adminLoading, isAdmin, login, register, updateUserName, logout, isAuthenticated: Boolean(user) }}>
       {children}
     </AuthContext.Provider>
   );
