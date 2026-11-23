@@ -47,15 +47,15 @@ export const AdminProducts = () => {
     setImageFile(null);
     setImagePreview('');
     setEditingId(product.id);
-    const editableProductFields = Object.fromEntries(
-      Object.entries(product).filter(([key]) => !['roast_level', 'rating', 'reviews_count', 'is_featured', 'is_best_seller'].includes(key))
-    );
     setForm({
       ...emptyForm,
-      ...editableProductFields,
+      name: product.name ?? '',
       category_id: product.category_id || product.categories?.id || '',
+      origin: product.origin ?? '',
       price: product.price ?? '',
-      stock: product.stock ?? ''
+      stock: product.stock ?? '',
+      description: product.description ?? '',
+      image_url: product.image_url ?? ''
     });
     setNotice('');
     window.scrollTo({ top: 0, behavior: 'smooth' });
