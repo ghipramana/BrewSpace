@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { Search, ArrowRight, Sparkles, Flame, Award } from 'lucide-react';
+import { Search, ArrowRight, Sparkles, Award } from 'lucide-react';
 import { Navbar } from '../components/common/Navbar';
 import { BottomNav } from '../components/common/BottomNav';
 import { ProductCard } from '../components/product/ProductCard';
@@ -14,7 +14,6 @@ export const Home = () => {
   const { user } = useAuth();
 
   const [categories, setCategories] = useState([]);
-  const [bestSellers, setBestSellers] = useState([]);
   const [featuredProducts, setFeaturedProducts] = useState([]);
   const [latestProducts, setLatestProducts] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -27,15 +26,13 @@ export const Home = () => {
       setError(null);
 
       // Fetch kategori dan produk secara paralel
-      const [catRes, bestRes, featRes, allRes] = await Promise.all([
+      const [catRes, featRes, allRes] = await Promise.all([
         getCategories(),
-        getProducts({ is_best_seller: true, limit: 4 }),
         getProducts({ is_featured: true, limit: 4 }),
         getProducts({ limit: 4 })
       ]);
 
       if (catRes.success) setCategories(catRes.data || []);
-      if (bestRes.success) setBestSellers(bestRes.data || []);
       if (featRes.success) setFeaturedProducts(featRes.data || []);
       if (allRes.success) setLatestProducts(allRes.data || []);
     } catch (err) {
@@ -130,34 +127,13 @@ export const Home = () => {
           <ErrorState message={error} onRetry={loadHomeData} />
         ) : (
           <>
-            {/* Section: Terlaris (Best Seller) */}
-            {bestSellers.length > 0 && (
-              <section>
-                <div className="section-header">
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                    <Flame size={20} color="#E65100" />
-                    <h3 className="section-title">Paling Terlaris</h3>
-                  </div>
-                  <Link to="/explore" className="section-link">
-                    <span>Lihat Semua</span>
-                    <ArrowRight size={14} />
-                  </Link>
-                </div>
-                <div className="products-grid">
-                  {bestSellers.map((prod) => (
-                    <ProductCard key={prod.id} product={prod} />
-                  ))}
-                </div>
-              </section>
-            )}
-
             {/* Section: Rekomendasi Pilihan (Featured) */}
             {featuredProducts.length > 0 && (
               <section>
                 <div className="section-header">
                   <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
                     <Sparkles size={20} color="#795548" />
-                    <h3 className="section-title">Rekomendasi Barista</h3>
+                    <h3 className="section-title">Pilihan BrewSpace</h3>
                   </div>
                   <Link to="/explore" className="section-link">
                     <span>Lihat Semua</span>
@@ -172,13 +148,13 @@ export const Home = () => {
               </section>
             )}
 
-            {/* Section: Terbaru di BrewSpace */}
+            {/* Section: Kopi Terbaru */}
             {latestProducts.length > 0 && (
               <section>
                 <div className="section-header">
                   <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
                     <Award size={20} color="#3E2723" />
-                    <h3 className="section-title">Koleksi Baru</h3>
+                    <h3 className="section-title">Kopi Terbaru</h3>
                   </div>
                   <Link to="/explore" className="section-link">
                     <span>Lihat Semua</span>
