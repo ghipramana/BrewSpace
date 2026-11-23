@@ -3,9 +3,13 @@ import { fallbackCategories, fallbackProducts } from './mockData';
 
 const PRODUCT_IMAGE_BUCKET = 'product-images';
 const ok = (data) => ({ success: true, data });
-const isInstantCoffee = (item) => Number(item.category_id ?? item.id) === 3
-  || item.categories?.slug === 'kopi-instan-drip'
-  || item.slug === 'kopi-instan-drip';
+const isInstantCoffee = (item) => {
+  const labels = [item.name, item.slug, item.categories?.name, item.categories?.slug]
+    .filter(Boolean)
+    .join(' ')
+    .toLowerCase();
+  return Number(item.category_id ?? item.id) === 3 || /instan|instant/.test(labels);
+};
 const ensureData = ({ data, error }) => {
   if (error) throw new Error(error.message);
   return data;
