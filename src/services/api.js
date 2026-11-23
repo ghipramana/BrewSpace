@@ -10,9 +10,9 @@ const ensureData = ({ data, error }) => {
 
 const currentUser = async () => {
   if (!supabaseClient) return null;
-  const { data, error } = await supabaseClient.auth.getUser();
+  const { data, error } = await supabaseClient.auth.getSession();
   if (error) throw new Error(error.message);
-  return data.user || null;
+  return data.session?.user || null;
 };
 
 const stored = (key, fallback) => {
