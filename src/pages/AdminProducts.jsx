@@ -8,7 +8,7 @@ import { createProduct, deleteProduct, getCategories, getProducts, updateProduct
 
 const emptyForm = {
   name: '', category_id: '', origin: '', price: '', stock: '',
-  description: '', image_url: '', is_featured: false, is_best_seller: false
+  description: '', image_url: ''
 };
 
 export const AdminProducts = () => {
@@ -48,7 +48,7 @@ export const AdminProducts = () => {
     setImagePreview('');
     setEditingId(product.id);
     const editableProductFields = Object.fromEntries(
-      Object.entries(product).filter(([key]) => !['roast_level', 'rating', 'reviews_count'].includes(key))
+      Object.entries(product).filter(([key]) => !['roast_level', 'rating', 'reviews_count', 'is_featured', 'is_best_seller'].includes(key))
     );
     setForm({
       ...emptyForm,
@@ -169,10 +169,6 @@ export const AdminProducts = () => {
               {(imagePreview || form.image_url) && <img src={imagePreview || form.image_url} alt="Pratinjau foto produk" style={{ display: 'block', width: 140, height: 110, objectFit: 'cover', borderRadius: 12, marginTop: 12 }} />}
             </div>
             <label className="form-group" style={{ display: 'block' }}><span className="form-label">Deskripsi</span><textarea className="form-textarea" name="description" rows="3" value={form.description} onChange={updateField} /></label>
-            <div style={{ display: 'flex', flexWrap: 'wrap', gap: 18, marginBottom: 18 }}>
-              <label><input type="checkbox" name="is_featured" checked={Boolean(form.is_featured)} onChange={updateField} /> Produk unggulan</label>
-              <label><input type="checkbox" name="is_best_seller" checked={Boolean(form.is_best_seller)} onChange={updateField} /> Terlaris</label>
-            </div>
             <div style={{ display: 'flex', gap: 10 }}>
               <button className="btn btn-primary" type="submit" disabled={saving}>{saving ? 'Menyimpan…' : <><Plus size={16} /> {editingId ? 'Simpan Perubahan' : 'Tambah Produk'}</>}</button>
               {editingId && <button className="btn btn-outline" type="button" onClick={resetForm}><X size={16} /> Batal</button>}
