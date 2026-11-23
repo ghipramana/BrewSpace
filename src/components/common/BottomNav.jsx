@@ -1,6 +1,6 @@
 import React from 'react';
 import { NavLink } from 'react-router-dom';
-import { Home, Compass, Heart, ClipboardList, User } from 'lucide-react';
+import { Home, Compass, Heart, ClipboardList, User, LogIn } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 
 export const BottomNav = () => {
@@ -40,7 +40,7 @@ export const BottomNav = () => {
         <span>Pesanan</span>
       </NavLink>
 
-      {!loading && isAuthenticated && (
+      {!loading && (isAuthenticated ? (
         <NavLink
           to="/profile"
           className={({ isActive }) => `nav-item ${isActive ? 'active' : ''}`}
@@ -48,7 +48,15 @@ export const BottomNav = () => {
           <User size={22} strokeWidth={2} />
           <span>Profil</span>
         </NavLink>
-      )}
+      ) : (
+        <NavLink
+          to="/login"
+          className={({ isActive }) => `nav-item ${isActive ? 'active' : ''}`}
+        >
+          <LogIn size={22} strokeWidth={2} />
+          <span>Masuk</span>
+        </NavLink>
+      ))}
     </nav>
   );
 };
