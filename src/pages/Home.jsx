@@ -89,13 +89,13 @@ export const Home = () => {
 
         {/* Promo Hero Banner */}
         <div className="promo-card">
-          <span className="promo-tag">Promo Awal Pekan</span>
-          <h3 className="promo-headline">Diskon 20% Koleksi Biji Kopi Nusantara</h3>
+          <span className="promo-tag">Kopi Spesial Indonesia</span>
+          <h3 className="promo-headline">Temukan Cerita di Setiap Seduhan</h3>
           <p className="promo-desc">
-            Nikmati aroma segar dari lereng pegunungan terbaik Indonesia langsung ke cangkirmu.
+            Jelajahi kopi dari berbagai daerah di Indonesia dan temukan karakter rasa yang cocok untukmu.
           </p>
-          <Link to="/explore?category_id=1" className="btn btn-secondary" style={{ padding: '8px 16px', fontSize: '0.82rem' }}>
-            Belanja Sekarang
+          <Link to="/explore" className="btn btn-secondary" style={{ padding: '8px 16px', fontSize: '0.82rem' }}>
+            Jelajahi Kopi
           </Link>
         </div>
 
