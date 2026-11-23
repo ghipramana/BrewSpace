@@ -3,6 +3,9 @@ import { fallbackCategories, fallbackProducts } from './mockData';
 
 const PRODUCT_IMAGE_BUCKET = 'product-images';
 const ok = (data) => ({ success: true, data });
+const isInstantCoffee = (item) => Number(item.category_id ?? item.id) === 3
+  || item.categories?.slug === 'kopi-instan-drip'
+  || item.slug === 'kopi-instan-drip';
 const ensureData = ({ data, error }) => {
   if (error) throw new Error(error.message);
   return data;
@@ -22,7 +25,7 @@ const save = (key, value) => localStorage.setItem(key, JSON.stringify(value));
 
 const getLocalProducts = () => {
   const products = stored('brewspace_local_products', fallbackProducts);
-  return products.filter((product) => Number(product.category_id) !== 3 && product.categories?.slug !== 'kopi-instan-drip');
+  return products.filter((product) => !isInstantCoffee(product));
 };
 
 export const uploadProductImage = async (file) => {
@@ -49,7 +52,7 @@ export const uploadProductImage = async (file) => {
 export const getCategories = async () => {
   if (!supabaseClient) return ok(fallbackCategories);
   const data = ensureData(await supabaseClient.from('categories').select('*').order('id'));
-  return ok(data);
+  return ok(data.filter((category) => !isInstantCoffee(category)));
 };
 
 export const getCategoryById = async (id) => {
@@ -82,7 +85,7 @@ export const getProducts = async (params = {}) => {
   else if (params.sort === 'price_desc') query = query.order('price', { ascending: false });
   else query = query.order('created_at', { ascending: false });
   if (params.limit) query = query.limit(Number(params.limit));
-  return ok(ensureData(await query));
+  return ok(ensureData(await query).filter((product) => !isInstantCoffee(product)));
 };
 
 export const getProductById = async (id) => {
