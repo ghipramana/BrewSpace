@@ -1,13 +1,12 @@
 import React, { useCallback, useEffect, useState } from 'react';
-import { Link, NavLink } from 'react-router-dom';
-import { ArrowRight, Coffee, ExternalLink, LayoutDashboard, Package, PackagePlus, RefreshCw, Tags, TriangleAlert } from 'lucide-react';
+import { Link } from 'react-router-dom';
+import { ArrowRight, Coffee, Package, PackagePlus, RefreshCw, Tags, TriangleAlert } from 'lucide-react';
 import { formatRupiah } from '../config/constants';
 import { getCategories, getProducts } from '../services/api';
-import { useAuth } from '../context/AuthContext';
+import { AdminSidebar } from '../components/common/AdminSidebar';
 import './AdminDashboard.css';
 
 export const AdminDashboard = () => {
-  const { user } = useAuth();
   const [products, setProducts] = useState([]);
   const [categories, setCategories] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -35,33 +34,11 @@ export const AdminDashboard = () => {
 
   return (
     <div className="admin-dashboard-shell">
-      <aside className="admin-sidebar">
-        <Link to="/admin" className="admin-brand">
-          <span className="admin-brand-icon"><Coffee size={22} /></span>
-          <span><strong>BrewSpace</strong><small>ADMIN PANEL</small></span>
-        </Link>
-
-        <div className="admin-sidebar-label">MENU ADMIN</div>
-        <nav className="admin-side-nav" aria-label="Navigasi admin">
-          <NavLink to="/admin" end className={({ isActive }) => `admin-side-link ${isActive ? 'active' : ''}`}>
-            <LayoutDashboard size={18} /> Dashboard
-          </NavLink>
-          <NavLink to="/admin/products" className={({ isActive }) => `admin-side-link ${isActive ? 'active' : ''}`}>
-            <PackagePlus size={18} /> Kelola Produk
-          </NavLink>
-        </nav>
-
-        <div className="admin-sidebar-bottom">
-          <div className="admin-account-label">Masuk sebagai admin</div>
-          <div className="admin-account-email" title={user?.email}>{user?.email || 'Admin BrewSpace'}</div>
-          <Link to="/" className="admin-store-link"><ExternalLink size={16} /> Lihat Toko</Link>
-        </div>
-      </aside>
+      <AdminSidebar />
 
       <main className="admin-main">
         <header className="admin-topbar">
           <div><span className="admin-topbar-eyebrow">BREWSPACE MANAGEMENT</span><strong>Dashboard Admin</strong></div>
-          <Link to="/" className="admin-mobile-store-link"><ExternalLink size={16} /> Lihat Toko</Link>
         </header>
 
         <div className="admin-content">

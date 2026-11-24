@@ -236,6 +236,29 @@ export const getOrderById = async (id) => {
   return ok(ensureData(await supabaseClient.from('orders').select('*, order_items(*)').eq('id', id).eq('user_id', user.id).single()));
 };
 
+export const getAdminOrders = async () => {
+  if (!supabaseClient) throw new Error('Data pesanan admin membutuhkan koneksi Supabase.');
+  const orders = ensureData(await supabaseClient
+    .from('orders')
+    .select('*, order_items(id, product_name, quantity, subtotal)')
+    .order('created_at', { ascending: false })
+    .limit(100));
+  const userIds = [...new Set(orders.map((order) => order.user_id).filter(Boolean))];
+  const profiles = userIds.length
+    ? ensureData(await supabaseClient.from('users').select('id, full_name, email').in('id', userIds))
+    : [];
+  const profileById = Object.fromEntries(profiles.map((profile) => [profile.id, profile]));
+  return ok(orders.map((order) => ({ ...order, customer: profileById[order.user_id] || null })));
+};
+
+export const getAdminCustomers = async () => {
+  if (!supabaseClient) throw new Error('Data pelanggan admin membutuhkan koneksi Supabase.');
+  return ok(ensureData(await supabaseClient
+    .from('users')
+    .select('id, email, full_name, phone, created_at')
+    .order('created_at', { ascending: false })));
+};
+
 export const checkoutOrder = async (payload) => {
   if (!supabaseClient) throw new Error('Checkout membutuhkan koneksi Supabase agar stok dan pesanan tersimpan dengan benar.');
   const user = await currentUser();

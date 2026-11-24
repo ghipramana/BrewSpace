@@ -1,8 +1,7 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { ArrowLeft, Edit2, Plus, Trash2, X } from 'lucide-react';
-import { Navbar } from '../components/common/Navbar';
-import { BottomNav } from '../components/common/BottomNav';
+import { AdminSidebar } from '../components/common/AdminSidebar';
 import { formatRupiah } from '../config/constants';
 import { createProduct, deleteProduct, getCategories, getProducts, updateProduct, uploadProductImage } from '../services/api';
 
@@ -140,9 +139,13 @@ export const AdminProducts = () => {
   };
 
   return (
-    <div className="app-container">
-      <Navbar />
-      <main className="page-content">
+    <div className="admin-dashboard-shell">
+      <AdminSidebar />
+      <main className="admin-main">
+        <header className="admin-topbar">
+          <div><span className="admin-topbar-eyebrow">BREWSPACE MANAGEMENT</span><strong>Kelola Produk</strong></div>
+        </header>
+        <div className="admin-content">
         <div style={{ width: 'min(100% - 32px, 900px)', margin: '28px auto' }}>
           <Link to="/admin" className="btn btn-outline" style={{ marginBottom: 20, textDecoration: 'none' }}>
             <ArrowLeft size={16} /> Kembali ke Dashboard Admin
@@ -189,8 +192,8 @@ export const AdminProducts = () => {
             </div>
           )}
         </div>
+        </div>
       </main>
-      <BottomNav />
     </div>
   );
 };

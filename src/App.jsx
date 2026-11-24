@@ -19,6 +19,9 @@ import { Login } from './pages/Login';
 import { Register } from './pages/Register';
 import { AdminProducts } from './pages/AdminProducts';
 import { AdminDashboard } from './pages/AdminDashboard';
+import { AdminOrders } from './pages/AdminOrders';
+import { AdminCustomers } from './pages/AdminCustomers';
+import { AdminAccount } from './pages/AdminAccount';
 
 const ProtectedRoute = ({ children, adminOnly = false }) => {
   const { isAuthenticated, loading, isAdmin, adminLoading } = useAuth();
@@ -48,6 +51,9 @@ export default function App() {
             <Route path="/profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
             <Route path="/admin" element={<ProtectedRoute adminOnly><AdminDashboard /></ProtectedRoute>} />
             <Route path="/admin/products" element={<ProtectedRoute adminOnly><AdminProducts /></ProtectedRoute>} />
+            <Route path="/admin/orders" element={<ProtectedRoute adminOnly><AdminOrders /></ProtectedRoute>} />
+            <Route path="/admin/customers" element={<ProtectedRoute adminOnly><AdminCustomers /></ProtectedRoute>} />
+            <Route path="/admin/account" element={<ProtectedRoute adminOnly><AdminAccount /></ProtectedRoute>} />
 
             {/* Halaman Transaksi & Detail Produk (Standalone Page) */}
             <Route path="/products/:id" element={<ProductDetail />} />
