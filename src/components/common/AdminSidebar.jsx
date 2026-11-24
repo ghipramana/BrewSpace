@@ -5,7 +5,7 @@ import { useAuth } from '../../context/AuthContext';
 
 const adminNavigation = [
   { to: '/admin', label: 'Dashboard', icon: LayoutDashboard, end: true },
-  { to: '/admin/products', label: 'Produk', icon: PackagePlus },
+  { to: '/admin/products', label: 'Kelola Produk', icon: PackagePlus },
   { to: '/admin/orders', label: 'Pesanan', icon: ClipboardList },
   { to: '/admin/customers', label: 'Pelanggan', icon: Users },
   { to: '/admin/account', label: 'Akun Admin', icon: UserRound }
