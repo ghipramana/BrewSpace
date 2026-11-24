@@ -33,6 +33,9 @@ BEGIN
   IF v_user_id IS NULL THEN
     RAISE EXCEPTION 'Masuk ke akun sebelum membuat pesanan.';
   END IF;
+  IF EXISTS (SELECT 1 FROM public.admin_users WHERE user_id = v_user_id) THEN
+    RAISE EXCEPTION 'Akun admin hanya untuk mengelola toko dan tidak dapat memesan produk.';
+  END IF;
 
   IF COALESCE(BTRIM(p_order_number), '') = '' THEN
     RAISE EXCEPTION 'Nomor pesanan tidak valid.';

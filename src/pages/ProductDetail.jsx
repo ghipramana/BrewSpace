@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams, useNavigate, Link } from 'react-router-dom';
 import { 
   ArrowLeft, Heart, ShoppingBag, Plus, Minus,
   MapPin, Check, ArrowRight
@@ -9,12 +9,14 @@ import { ErrorState } from '../components/common/ErrorState';
 import { getProductById, addFavorite, removeFavorite } from '../services/api';
 import { formatRupiah } from '../config/constants';
 import { useCart } from '../context/CartContext';
+import { useAuth } from '../context/AuthContext';
 import { Navbar } from '../components/common/Navbar';
 
 export const ProductDetail = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const { addItem, itemCount } = useCart();
+  const { isAdmin } = useAuth();
 
   const [product, setProduct] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -61,6 +63,7 @@ export const ProductDetail = () => {
   };
 
   const handleAddToCart = async () => {
+    if (isAdmin) return;
     try {
       await addItem(product.id, quantity);
       setAddedToast(true);
@@ -71,6 +74,7 @@ export const ProductDetail = () => {
   };
 
   const handleBuyNow = () => {
+    if (isAdmin) return;
     navigate('/checkout', {
       state: {
         directItem: {
@@ -139,7 +143,7 @@ export const ProductDetail = () => {
           >
             <Heart size={20} fill={isFav ? '#D32F2F' : 'none'} stroke={isFav ? '#D32F2F' : 'currentColor'} />
           </button>
-          <button
+          {!isAdmin && <button
             onClick={() => navigate('/cart')}
             className="icon-btn mobile-only"
             aria-label="Keranjang"
@@ -147,7 +151,7 @@ export const ProductDetail = () => {
           >
             <ShoppingBag size={20} />
             {itemCount > 0 && <span className="badge-count">{itemCount}</span>}
-          </button>
+          </button>}
         </div>
       </div>
 
@@ -206,7 +210,7 @@ export const ProductDetail = () => {
             </div>
 
             {/* Quantity Selector */}
-            <div className="detail-qty-box">
+            {!isAdmin && <div className="detail-qty-box">
               <span style={{ fontSize: '0.9rem', fontWeight: 700, color: 'var(--text-main)' }}>
                 Jumlah Pesanan
               </span>
@@ -227,10 +231,10 @@ export const ProductDetail = () => {
                   <Plus size={14} />
                 </button>
               </div>
-            </div>
+            </div>}
 
             {/* Desktop Action Buttons (Visible on PC >= 768px) */}
-            <div className="detail-actions-desktop desktop-only">
+            {!isAdmin ? <div className="detail-actions-desktop desktop-only">
               <div className="detail-price-desktop">
                 <span className="price-sub">Total Pembelian:</span>
                 <span className="price-val">{formatRupiah(product.price * quantity)}</span>
@@ -253,13 +257,15 @@ export const ProductDetail = () => {
                   <ArrowRight size={18} />
                 </button>
               </div>
-            </div>
+            </div> : <Link to="/admin/products" className="btn btn-primary admin-product-management-link">
+              Kelola produk ini
+            </Link>}
           </div>
         </div>
       </main>
 
       {/* Added Toast Notification */}
-      {addedToast && (
+      {addedToast && !isAdmin && (
         <div style={{
           position: 'fixed',
           top: '70px',
@@ -284,7 +290,7 @@ export const ProductDetail = () => {
       )}
 
       {/* Mobile Sticky Bottom Action Bar */}
-      <footer className="detail-bottom-bar mobile-only">
+      {!isAdmin && <footer className="detail-bottom-bar mobile-only">
         <div style={{ flex: 1 }}>
           <span style={{ fontSize: '0.72rem', color: 'var(--text-muted)', display: 'block' }}>Total Harga</span>
           <span style={{ fontSize: '1.1rem', fontWeight: 800, color: 'var(--primary)' }}>
@@ -309,7 +315,7 @@ export const ProductDetail = () => {
         >
           Beli Sekarang
         </button>
-      </footer>
+      </footer>}
     </div>
   );
 };

@@ -34,6 +34,15 @@ const ProtectedRoute = ({ children, adminOnly = false }) => {
   return children;
 };
 
+const CustomerOnlyRoute = ({ children }) => {
+  const { isAdmin, isAuthenticated, loading, adminLoading } = useAuth();
+  if (loading || (isAuthenticated && adminLoading)) {
+    return <LoadingState message="Memeriksa akses akun..." />;
+  }
+  if (isAdmin) return <Navigate to="/admin" replace />;
+  return children;
+};
+
 export default function App() {
   return (
     <AuthProvider>
@@ -47,7 +56,7 @@ export default function App() {
             <Route path="/" element={<Home />} />
             <Route path="/explore" element={<Explore />} />
             <Route path="/favorites" element={<Favorites />} />
-            <Route path="/orders" element={<Orders />} />
+            <Route path="/orders" element={<CustomerOnlyRoute><Orders /></CustomerOnlyRoute>} />
             <Route path="/profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
             <Route path="/admin" element={<ProtectedRoute adminOnly><AdminDashboard /></ProtectedRoute>} />
             <Route path="/admin/products" element={<ProtectedRoute adminOnly><AdminProducts /></ProtectedRoute>} />
@@ -57,9 +66,9 @@ export default function App() {
 
             {/* Halaman Transaksi & Detail Produk (Standalone Page) */}
             <Route path="/products/:id" element={<ProductDetail />} />
-            <Route path="/cart" element={<Cart />} />
-            <Route path="/checkout" element={<Checkout />} />
-            <Route path="/orders/:id" element={<OrderDetail />} />
+            <Route path="/cart" element={<CustomerOnlyRoute><Cart /></CustomerOnlyRoute>} />
+            <Route path="/checkout" element={<CustomerOnlyRoute><Checkout /></CustomerOnlyRoute>} />
+            <Route path="/orders/:id" element={<CustomerOnlyRoute><OrderDetail /></CustomerOnlyRoute>} />
 
             {/* Halaman Autentikasi */}
             <Route path="/login" element={<Login />} />

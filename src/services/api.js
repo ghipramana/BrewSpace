@@ -22,6 +22,17 @@ const currentUser = async () => {
   return data.session?.user || null;
 };
 
+const ensureCustomerCanOrder = async (user) => {
+  if (!user || !supabaseClient) return;
+  const { data, error } = await supabaseClient
+    .from('admin_users')
+    .select('user_id')
+    .eq('user_id', user.id)
+    .maybeSingle();
+  if (error) throw new Error(error.message);
+  if (data) throw new Error('Akun admin hanya untuk mengelola toko dan tidak dapat memesan produk.');
+};
+
 const stored = (key, fallback) => {
   try { return JSON.parse(localStorage.getItem(key)) ?? fallback; } catch { return fallback; }
 };
@@ -151,6 +162,7 @@ export const getCart = async () => {
 
 export const addToCart = async (productId, quantity = 1, grindOption = 'Biji Utuh') => {
   const user = await currentUser();
+  await ensureCustomerCanOrder(user);
   if (!user) {
     const items = localCart();
     const product = getLocalProducts().find((item) => item.id === productId) || getLocalProducts()[0];
@@ -263,6 +275,7 @@ export const checkoutOrder = async (payload) => {
   if (!supabaseClient) throw new Error('Checkout membutuhkan koneksi Supabase agar stok dan pesanan tersimpan dengan benar.');
   const user = await currentUser();
   if (!user) throw new Error('Masuk ke akun sebelum membuat pesanan.');
+  await ensureCustomerCanOrder(user);
   let items = payload.items;
   if (!items?.length) {
     const cart = await getCart();

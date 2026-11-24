@@ -1,10 +1,11 @@
 import React from 'react';
 import { NavLink } from 'react-router-dom';
-import { Home, Compass, Heart, ClipboardList, User, LogIn } from 'lucide-react';
+import { Home, Compass, Heart, ClipboardList, User, LogIn, LayoutDashboard } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 
 export const BottomNav = () => {
-  const { isAuthenticated, loading } = useAuth();
+  const { isAuthenticated, isAdmin, loading, adminLoading } = useAuth();
+  const roleLoading = loading || (isAuthenticated && adminLoading);
   return (
     <nav className="bottom-nav">
       <NavLink
@@ -32,15 +33,19 @@ export const BottomNav = () => {
         <span>Favorit</span>
       </NavLink>
 
-      <NavLink
-        to="/orders"
-        className={({ isActive }) => `nav-item ${isActive ? 'active' : ''}`}
-      >
-        <ClipboardList size={22} strokeWidth={2} />
-        <span>Pesanan</span>
-      </NavLink>
+      {!roleLoading && (isAdmin ? (
+        <NavLink to="/admin" className={({ isActive }) => `nav-item ${isActive ? 'active' : ''}`}>
+          <LayoutDashboard size={22} strokeWidth={2} />
+          <span>Admin</span>
+        </NavLink>
+      ) : (
+        <NavLink to="/orders" className={({ isActive }) => `nav-item ${isActive ? 'active' : ''}`}>
+          <ClipboardList size={22} strokeWidth={2} />
+          <span>Pesanan</span>
+        </NavLink>
+      ))}
 
-      {!loading && (isAuthenticated ? (
+      {!roleLoading && (isAuthenticated ? (
         <NavLink
           to="/profile"
           className={({ isActive }) => `nav-item ${isActive ? 'active' : ''}`}

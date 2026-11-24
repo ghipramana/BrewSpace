@@ -1,12 +1,13 @@
 import React from 'react';
 import { Link, NavLink } from 'react-router-dom';
-import { Coffee, ShoppingBag, Heart, User, LogIn } from 'lucide-react';
+import { Coffee, ShoppingBag, Heart, User, LogIn, LayoutDashboard } from 'lucide-react';
 import { useCart } from '../../context/CartContext';
 import { useAuth } from '../../context/AuthContext';
 
 export const Navbar = () => {
   const { itemCount } = useCart();
-  const { user, isAuthenticated, loading: authLoading } = useAuth();
+  const { user, isAuthenticated, isAdmin, loading: authLoading, adminLoading } = useAuth();
+  const roleLoading = authLoading || (isAuthenticated && adminLoading);
 
   return (
     <header className="top-header">
@@ -43,13 +44,20 @@ export const Navbar = () => {
           >
             Favorit
           </NavLink>
-          <NavLink
-            to="/orders"
-            className={({ isActive }) => `desktop-nav-link ${isActive ? 'active' : ''}`}
-          >
-            Pesanan
-          </NavLink>
-          {!authLoading && isAuthenticated && (
+          {!roleLoading && !isAdmin && (
+            <NavLink
+              to="/orders"
+              className={({ isActive }) => `desktop-nav-link ${isActive ? 'active' : ''}`}
+            >
+              Pesanan
+            </NavLink>
+          )}
+          {!roleLoading && isAdmin && (
+            <NavLink to="/admin" className={({ isActive }) => `desktop-nav-link ${isActive ? 'active' : ''}`}>
+              <LayoutDashboard size={15} /> Panel Admin
+            </NavLink>
+          )}
+          {!roleLoading && isAuthenticated && (
             <NavLink
               to="/profile"
               className={({ isActive }) => `desktop-nav-link ${isActive ? 'active' : ''}`}
@@ -62,16 +70,16 @@ export const Navbar = () => {
         {/* Header Right Actions */}
         <div className="header-actions">
           {/* Mobile-only Favorites icon */}
-          <Link to="/favorites" className="icon-btn mobile-only" aria-label="Favorit">
+          {!isAdmin && <Link to="/favorites" className="icon-btn mobile-only" aria-label="Favorit">
             <Heart size={20} strokeWidth={2} />
-          </Link>
+          </Link>}
 
           {/* Cart button */}
-          <Link to="/cart" className="icon-btn cart-btn-header" aria-label="Keranjang Belanja">
+          {!isAdmin && <Link to="/cart" className="icon-btn cart-btn-header" aria-label="Keranjang Belanja">
             <ShoppingBag size={20} strokeWidth={2} />
             <span className="desktop-only cart-text">Keranjang</span>
             {itemCount > 0 && <span className="badge-count">{itemCount}</span>}
-          </Link>
+          </Link>}
 
           {/* Auth status on Desktop */}
           {authLoading ? null : isAuthenticated ? (
