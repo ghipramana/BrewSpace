@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { 
   User, Mail, Phone, MapPin, Coffee, Download, 
-  LogOut, Edit3, Check, ShieldCheck, BookOpen, Sparkles, PackagePlus
+  LogOut, Edit3, Check, ShieldCheck, BookOpen, Sparkles, PackagePlus, LayoutDashboard
 } from 'lucide-react';
 import { Navbar } from '../components/common/Navbar';
 import { BottomNav } from '../components/common/BottomNav';
@@ -152,9 +152,14 @@ export const Profile = () => {
           </div>
 
           {isAdmin && (
-            <Link to="/admin/products" className="btn btn-primary" style={{ alignSelf: 'flex-start', marginBottom: 18, textDecoration: 'none' }}>
-              <PackagePlus size={17} /> Kelola Produk
-            </Link>
+            <div style={{ display: 'flex', flexWrap: 'wrap', gap: 10, alignSelf: 'flex-start', marginBottom: 18 }}>
+              <Link to="/admin" className="btn btn-primary" style={{ textDecoration: 'none' }}>
+                <LayoutDashboard size={17} /> Dashboard Admin
+              </Link>
+              <Link to="/admin/products" className="btn btn-outline" style={{ textDecoration: 'none' }}>
+                <PackagePlus size={17} /> Kelola Produk
+              </Link>
+            </div>
           )}
 
           {/* Edit Form or Information Details */}

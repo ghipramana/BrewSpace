@@ -18,6 +18,7 @@ import { OrderDetail } from './pages/OrderDetail';
 import { Login } from './pages/Login';
 import { Register } from './pages/Register';
 import { AdminProducts } from './pages/AdminProducts';
+import { AdminDashboard } from './pages/AdminDashboard';
 
 const ProtectedRoute = ({ children, adminOnly = false }) => {
   const { isAuthenticated, loading, isAdmin, adminLoading } = useAuth();
@@ -45,6 +46,7 @@ export default function App() {
             <Route path="/favorites" element={<Favorites />} />
             <Route path="/orders" element={<Orders />} />
             <Route path="/profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
+            <Route path="/admin" element={<ProtectedRoute adminOnly><AdminDashboard /></ProtectedRoute>} />
             <Route path="/admin/products" element={<ProtectedRoute adminOnly><AdminProducts /></ProtectedRoute>} />
 
             {/* Halaman Transaksi & Detail Produk (Standalone Page) */}

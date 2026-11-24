@@ -144,8 +144,8 @@ export const AdminProducts = () => {
       <Navbar />
       <main className="page-content">
         <div style={{ width: 'min(100% - 32px, 900px)', margin: '28px auto' }}>
-          <Link to="/profile" className="btn btn-outline" style={{ marginBottom: 20, textDecoration: 'none' }}>
-            <ArrowLeft size={16} /> Kembali ke Profil
+          <Link to="/admin" className="btn btn-outline" style={{ marginBottom: 20, textDecoration: 'none' }}>
+            <ArrowLeft size={16} /> Kembali ke Dashboard Admin
           </Link>
           <h1 style={{ color: 'var(--primary)', marginBottom: 6 }}>Kelola Produk</h1>
           <p style={{ color: 'var(--text-muted)', marginBottom: 24 }}>Tambah, ubah, atau hapus produk di katalog BrewSpace.</p>
