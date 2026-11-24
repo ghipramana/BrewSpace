@@ -1,14 +1,12 @@
 import React from 'react';
 import { Link, NavLink } from 'react-router-dom';
-import { Coffee, ExternalLink, LayoutDashboard, PackagePlus, ClipboardList, Users, UserRound } from 'lucide-react';
+import { Coffee, ExternalLink, LayoutDashboard, PackagePlus, ClipboardList } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 
 const adminNavigation = [
   { to: '/admin', label: 'Dashboard', icon: LayoutDashboard, end: true },
   { to: '/admin/products', label: 'Kelola Produk', icon: PackagePlus },
-  { to: '/admin/orders', label: 'Pesanan', icon: ClipboardList },
-  { to: '/admin/customers', label: 'Pelanggan', icon: Users },
-  { to: '/admin/account', label: 'Akun Admin', icon: UserRound }
+  { to: '/admin/orders', label: 'Pesanan', icon: ClipboardList }
 ];
 
 export const AdminSidebar = () => {
