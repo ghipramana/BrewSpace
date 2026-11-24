@@ -3,7 +3,7 @@
 // Strategi: App Shell Precaching, Cache-First Static, Network-First API
 // ==============================================================================
 
-const CACHE_VERSION = 'v1.0.0';
+const CACHE_VERSION = 'v1.1.0';
 const STATIC_CACHE_NAME = `brewspace-static-${CACHE_VERSION}`;
 const API_CACHE_NAME = `brewspace-api-${CACHE_VERSION}`;
 

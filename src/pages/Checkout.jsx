@@ -10,6 +10,7 @@ import { useNetworkStatus } from '../hooks/useNetworkStatus';
 import { checkoutOrder } from '../services/api';
 import { formatRupiah, PAYMENT_METHODS } from '../config/constants';
 import { Navbar } from '../components/common/Navbar';
+import './PaymentQRIS.css';
 
 export const Checkout = () => {
   const navigate = useNavigate();
@@ -41,7 +42,7 @@ export const Checkout = () => {
   // Form states
   const [shippingAddress, setShippingAddress] = useState('Jl. Kampus Merdeka No. 12, Sleman, D.I. Yogyakarta 55281');
   const [shippingPhone, setShippingPhone] = useState('081234567890');
-  const [paymentMethod, setPaymentMethod] = useState('QRIS (Simulasi)');
+  const [paymentMethod, setPaymentMethod] = useState('QRIS');
   const [notes, setNotes] = useState('');
   const [submitting, setSubmitting] = useState(false);
   const [errorMsg, setErrorMsg] = useState(null);
@@ -207,7 +208,7 @@ export const Checkout = () => {
               </div>
             </div>
 
-            {/* Section: Metode Pembayaran (Simulasi) */}
+            {/* Section: Pembayaran QRIS */}
             <div style={{
               backgroundColor: 'var(--surface)',
               borderRadius: 'var(--radius-lg)',
@@ -219,7 +220,7 @@ export const Checkout = () => {
               <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '14px' }}>
                 <CreditCard size={18} color="var(--primary)" />
                 <h3 style={{ fontSize: '0.98rem', fontWeight: 700, color: 'var(--primary)' }}>
-                  Metode Pembayaran (Simulasi)
+                  Pembayaran QRIS
                 </h3>
               </div>
 
@@ -256,6 +257,10 @@ export const Checkout = () => {
                     </div>
                   </label>
                 ))}
+              </div>
+              <div className="qris-payment-box">
+                <p>Setelah pesanan berhasil dibuat, kode QRIS dan jumlah pembayaran akan tampil di halaman rincian pesanan.</p>
+                <strong>Tagihan: {formatRupiah(grandTotal)}</strong>
               </div>
             </div>
           </div>
@@ -305,7 +310,7 @@ export const Checkout = () => {
                 className="btn btn-primary btn-block desktop-only"
                 style={{ marginTop: '20px', padding: '14px' }}
               >
-                {submitting ? 'Memproses Pesanan...' : !isOnline ? 'Offline' : 'Konfirmasi & Bayar Sekarang'}
+                {submitting ? 'Memproses Pesanan...' : !isOnline ? 'Offline' : 'Buat Pesanan & Lihat QRIS'}
               </button>
             </div>
           </div>
@@ -325,7 +330,7 @@ export const Checkout = () => {
               className="btn btn-primary"
               style={{ padding: '12px 24px' }}
             >
-              {submitting ? 'Memproses...' : !isOnline ? 'Offline' : 'Bayar Sekarang'}
+              {submitting ? 'Memproses...' : !isOnline ? 'Offline' : 'Buat Pesanan'}
             </button>
           </footer>
         </form>

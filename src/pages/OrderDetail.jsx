@@ -9,6 +9,7 @@ import { ErrorState } from '../components/common/ErrorState';
 import { getOrderById } from '../services/api';
 import { formatRupiah, formatDate } from '../config/constants';
 import { Navbar } from '../components/common/Navbar';
+import './PaymentQRIS.css';
 
 export const OrderDetail = () => {
   const { id } = useParams();
@@ -230,6 +231,16 @@ export const OrderDetail = () => {
                 {order.payment_method || 'Simulasi'}
               </p>
             </div>
+
+            {String(order.payment_method || '').toLowerCase().includes('qris') && (
+              <div className="qris-payment-box order-qris-box">
+                <h3>Bayar dengan QRIS</h3>
+                <p>Scan kode ini menggunakan GoPay, mobile banking, atau e-wallet yang mendukung QRIS. Pastikan nominalnya sesuai total pembayaran.</p>
+                <img src="/images/qris-brewspace.png" alt="Kode pembayaran QRIS GoPay Merchant" />
+                <strong>Total pembayaran: {formatRupiah(order.total_amount)}</strong>
+                <small>Pembayaran akan diperiksa oleh admin setelah transfer berhasil.</small>
+              </div>
+            )}
 
             {order.notes && (
               <div>

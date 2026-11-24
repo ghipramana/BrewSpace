@@ -12,8 +12,8 @@ export const AdminDashboard = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
 
-  const loadDashboard = useCallback(async () => {
-    setLoading(true);
+  const loadDashboard = useCallback(async ({ silent = false } = {}) => {
+    if (!silent) setLoading(true);
     setError('');
     try {
       const [productResult, categoryResult] = await Promise.all([getProducts(), getCategories()]);
@@ -22,11 +22,15 @@ export const AdminDashboard = () => {
     } catch (err) {
       setError(err.message || 'Gagal memuat ringkasan admin.');
     } finally {
-      setLoading(false);
+      if (!silent) setLoading(false);
     }
   }, []);
 
   useEffect(() => { loadDashboard(); }, [loadDashboard]);
+  useEffect(() => {
+    const interval = window.setInterval(() => loadDashboard({ silent: true }), 15000);
+    return () => window.clearInterval(interval);
+  }, [loadDashboard]);
 
   const lowStockProducts = products.filter((product) => Number(product.stock || 0) > 0 && Number(product.stock || 0) <= 5);
   const outOfStockProducts = products.filter((product) => Number(product.stock || 0) === 0);

@@ -1,6 +1,9 @@
 -- Jalankan sekali di Supabase Dashboard > SQL Editor setelah tabel BrewSpace tersedia.
 -- Checkout dibuat sebagai satu transaksi: validasi stok, kurangi stok, simpan pesanan,
 -- simpan item pesanan, dan (untuk checkout keranjang) kosongkan keranjang.
+-- Skrip ini juga memberi admin akses baca seluruh pesanan dan profil pelanggan.
+
+ALTER TABLE public.orders ALTER COLUMN payment_method SET DEFAULT 'QRIS';
 
 CREATE OR REPLACE FUNCTION public.checkout_order(
   p_order_number TEXT,
@@ -97,7 +100,7 @@ BEGIN
     'Diproses',
     p_shipping_address,
     p_shipping_phone,
-    COALESCE(NULLIF(p_payment_method, ''), 'Transfer Bank (Simulasi)'),
+    COALESCE(NULLIF(p_payment_method, ''), 'QRIS'),
     NULLIF(p_notes, '')
   ) RETURNING * INTO v_order;
 
@@ -125,3 +128,35 @@ $$;
 
 REVOKE ALL ON FUNCTION public.checkout_order(TEXT, TEXT, TEXT, TEXT, TEXT, JSONB, BOOLEAN) FROM PUBLIC, anon, authenticated;
 GRANT EXECUTE ON FUNCTION public.checkout_order(TEXT, TEXT, TEXT, TEXT, TEXT, JSONB, BOOLEAN) TO authenticated;
+
+DROP POLICY IF EXISTS "Admins read all orders" ON public.orders;
+CREATE POLICY "Admins read all orders"
+ON public.orders FOR SELECT TO authenticated
+USING (
+  EXISTS (
+    SELECT 1 FROM public.admin_users
+    WHERE user_id = auth.uid()
+  )
+);
+
+DROP POLICY IF EXISTS "Admins read all order items" ON public.order_items;
+CREATE POLICY "Admins read all order items"
+ON public.order_items FOR SELECT TO authenticated
+USING (
+  EXISTS (
+    SELECT 1
+    FROM public.orders
+    JOIN public.admin_users ON admin_users.user_id = auth.uid()
+    WHERE orders.id = order_items.order_id
+  )
+);
+
+DROP POLICY IF EXISTS "Admins read all customer profiles" ON public.users;
+CREATE POLICY "Admins read all customer profiles"
+ON public.users FOR SELECT TO authenticated
+USING (
+  EXISTS (
+    SELECT 1 FROM public.admin_users
+    WHERE user_id = auth.uid()
+  )
+);

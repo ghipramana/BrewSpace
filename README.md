@@ -25,9 +25,8 @@ Di Supabase Dashboard, pilih **SQL Editor**. Untuk project Supabase baru, jalank
 3. `supabase/direct_access.sql`
 4. `supabase/product_images_storage.sql`
 5. `supabase/checkout_stock.sql`
-6. `supabase/admin_dashboard_access.sql`
 
-Jika tabel dan produk BrewSpace sudah ada, jalankan `direct_access.sql`, `product_images_storage.sql`, `checkout_stock.sql`, dan `admin_dashboard_access.sql`. Skrip dashboard admin memberi akses baca pesanan dan profil pelanggan kepada admin.
+Jika tabel dan produk BrewSpace sudah ada, jalankan `direct_access.sql`, `product_images_storage.sql`, dan `checkout_stock.sql`. Skrip checkout menurunkan stok secara aman dan memberi admin akses baca pesanan serta profil pelanggan.
 
 ### Akun admin
 

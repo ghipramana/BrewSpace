@@ -20,11 +20,9 @@ export const GRIND_OPTIONS = [
   { id: 'Halus', label: 'Halus', desc: 'Cocok untuk Espresso & Kopi Tubruk' }
 ];
 
-// Opsi metode pembayaran simulasi
+// Metode pembayaran toko
 export const PAYMENT_METHODS = [
-  { id: 'QRIS (Simulasi)', name: 'QRIS (Semua E-Wallet / Mobile Banking)', desc: 'Instan & Bebas Biaya Layanan' },
-  { id: 'Transfer Bank (Simulasi)', name: 'Virtual Account Bank', desc: 'BCA, Mandiri, BNI, BRI' },
-  { id: 'COD (Bayar di Tempat)', name: 'Cash on Delivery (COD)', desc: 'Bayar tunai saat kopi tiba' }
+  { id: 'QRIS', name: 'QRIS GoPay Merchant', desc: 'Bayar dengan GoPay, mobile banking, atau e-wallet yang mendukung QRIS' }
 ];
 
 /**

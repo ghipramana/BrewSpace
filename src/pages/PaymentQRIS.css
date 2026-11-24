@@ -1,0 +1,46 @@
+.qris-payment-box {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  margin-top: 16px;
+  padding: 15px;
+  border: 1px solid #e9dfd7;
+  border-radius: 14px;
+  background: #fcfaf7;
+  text-align: center;
+}
+
+.qris-payment-box h3 {
+  color: var(--primary);
+  font-size: 0.95rem;
+}
+
+.qris-payment-box p {
+  max-width: 520px;
+  color: var(--text-muted);
+  font-size: 0.78rem;
+  line-height: 1.55;
+}
+
+.qris-payment-box img {
+  display: block;
+  width: min(100%, 340px);
+  max-height: 510px;
+  border: 1px solid #e7e2dc;
+  border-radius: 10px;
+  background: #fff;
+  object-fit: contain;
+}
+
+.qris-payment-box > strong {
+  color: var(--primary);
+  font-size: 0.88rem;
+}
+
+.qris-payment-box > small {
+  color: var(--text-muted);
+  font-size: 0.7rem;
+}
+
+.order-qris-box { align-items: center; margin-top: 0; }

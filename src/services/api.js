@@ -287,7 +287,7 @@ export const checkoutOrder = async (payload) => {
     p_order_number: orderNumber,
     p_shipping_address: payload.shipping_address,
     p_shipping_phone: payload.shipping_phone,
-    p_payment_method: payload.payment_method || 'Transfer Bank (Simulasi)',
+    p_payment_method: payload.payment_method || 'QRIS',
     p_notes: payload.notes || null,
     p_items: orderItems,
     p_clear_cart: !payload.items?.length

@@ -149,7 +149,7 @@ CREATE TABLE IF NOT EXISTS public.orders (
         CHECK (status IN ('Pending', 'Diproses', 'Dikirim', 'Selesai', 'Dibatalkan')),
     shipping_address TEXT NOT NULL,
     shipping_phone VARCHAR(30) NOT NULL,
-    payment_method VARCHAR(50) NOT NULL DEFAULT 'Transfer Bank (Simulasi)',
+    payment_method VARCHAR(50) NOT NULL DEFAULT 'QRIS',
     notes TEXT,
     created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
     updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
