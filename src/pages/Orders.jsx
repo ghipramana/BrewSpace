@@ -8,8 +8,10 @@ import { EmptyState } from '../components/common/EmptyState';
 import { ErrorState } from '../components/common/ErrorState';
 import { getOrders } from '../services/api';
 import { formatRupiah, formatDate } from '../config/constants';
+import { useAuth } from '../context/AuthContext';
 
 export const Orders = () => {
+  const { isAdmin, adminLoading } = useAuth();
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -31,8 +33,13 @@ export const Orders = () => {
   };
 
   useEffect(() => {
+    if (isAdmin || adminLoading) {
+      setOrders([]);
+      setLoading(adminLoading);
+      return;
+    }
     fetchUserOrders();
-  }, []);
+  }, [isAdmin, adminLoading]);
 
   return (
     <div className="app-container">
@@ -44,7 +51,7 @@ export const Orders = () => {
             Riwayat Pesanan
           </h1>
           <p style={{ fontSize: '0.86rem', color: 'var(--text-muted)' }}>
-            Pantau status pemrosesan dan riwayat pembelian kopi Anda di BrewSpace.
+            {isAdmin ? 'Akun admin tidak memiliki riwayat pembelian.' : 'Pantau status pemrosesan dan riwayat pembelian kopi Anda di BrewSpace.'}
           </p>
         </div>
 
@@ -55,10 +62,10 @@ export const Orders = () => {
         ) : orders.length === 0 ? (
           <EmptyState
             icon={ClipboardList}
-            title="Belum Ada Pesanan"
-            description="Anda belum pernah melakukan pemesanan kopi. Yuk coba seduhan kopi terbaik kami!"
-            actionText="Mulai Belanja Kopi"
-            actionLink="/explore"
+            title={isAdmin ? 'Riwayat Admin Kosong' : 'Belum Ada Pesanan'}
+            description={isAdmin ? 'Akun admin digunakan untuk mengelola toko, bukan untuk memesan produk.' : 'Anda belum pernah melakukan pemesanan kopi. Yuk coba seduhan kopi terbaik kami!'}
+            actionText={isAdmin ? 'Kembali ke Dashboard Admin' : 'Mulai Belanja Kopi'}
+            actionLink={isAdmin ? '/admin' : '/explore'}
           />
         ) : (
           <div className="orders-container">

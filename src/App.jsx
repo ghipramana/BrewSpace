@@ -56,7 +56,7 @@ export default function App() {
             <Route path="/" element={<Home />} />
             <Route path="/explore" element={<Explore />} />
             <Route path="/favorites" element={<Favorites />} />
-            <Route path="/orders" element={<CustomerOnlyRoute><Orders /></CustomerOnlyRoute>} />
+            <Route path="/orders" element={<Orders />} />
             <Route path="/profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
             <Route path="/admin" element={<ProtectedRoute adminOnly><AdminDashboard /></ProtectedRoute>} />
             <Route path="/admin/products" element={<ProtectedRoute adminOnly><AdminProducts /></ProtectedRoute>} />

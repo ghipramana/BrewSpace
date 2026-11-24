@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link, NavLink } from 'react-router-dom';
-import { Coffee, ShoppingBag, Heart, User, LogIn, LayoutDashboard } from 'lucide-react';
+import { Coffee, ShoppingBag, Heart, User, LogIn } from 'lucide-react';
 import { useCart } from '../../context/CartContext';
 import { useAuth } from '../../context/AuthContext';
 
@@ -44,19 +44,12 @@ export const Navbar = () => {
           >
             Favorit
           </NavLink>
-          {!roleLoading && !isAdmin && (
-            <NavLink
-              to="/orders"
-              className={({ isActive }) => `desktop-nav-link ${isActive ? 'active' : ''}`}
-            >
-              Pesanan
-            </NavLink>
-          )}
-          {!roleLoading && isAdmin && (
-            <NavLink to="/admin" className={({ isActive }) => `desktop-nav-link ${isActive ? 'active' : ''}`}>
-              <LayoutDashboard size={15} /> Panel Admin
-            </NavLink>
-          )}
+          <NavLink
+            to="/orders"
+            className={({ isActive }) => `desktop-nav-link ${isActive ? 'active' : ''}`}
+          >
+            Pesanan
+          </NavLink>
           {!roleLoading && isAuthenticated && (
             <NavLink
               to="/profile"
