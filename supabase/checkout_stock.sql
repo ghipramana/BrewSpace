@@ -163,3 +163,6 @@ USING (
     WHERE user_id = auth.uid()
   )
 );
+
+-- Minta PostgREST/Supabase API memuat ulang daftar fungsi RPC setelah skrip dijalankan.
+NOTIFY pgrst, 'reload schema';
