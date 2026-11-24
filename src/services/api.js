@@ -237,6 +237,7 @@ export const getOrderById = async (id) => {
 };
 
 export const checkoutOrder = async (payload) => {
+  if (!supabaseClient) throw new Error('Checkout membutuhkan koneksi Supabase agar stok dan pesanan tersimpan dengan benar.');
   const user = await currentUser();
   if (!user) throw new Error('Masuk ke akun sebelum membuat pesanan.');
   let items = payload.items;
@@ -252,36 +253,23 @@ export const checkoutOrder = async (payload) => {
   }
   if (!items.length) throw new Error('Keranjang belanja masih kosong.');
 
-  const subtotal = items.reduce((sum, item) => sum + Number(item.price) * Number(item.quantity), 0);
   const date = new Date().toISOString().slice(0, 10).replace(/-/g, '');
   const orderNumber = `BS-${date}-${Math.floor(1000 + Math.random() * 9000)}`;
-  const order = ensureData(await supabaseClient.from('orders').insert({
-    order_number: orderNumber,
-    user_id: user.id,
-    total_amount: subtotal + 15000,
-    status: 'Diproses',
-    shipping_address: payload.shipping_address,
-    shipping_phone: payload.shipping_phone,
-    payment_method: payload.payment_method || 'Transfer Bank (Simulasi)',
-    notes: payload.notes || null
-  }).select().single());
-
-  const itemRows = items.map((item) => ({
-    order_id: order.id,
-    product_id: item.product_id || null,
-    product_name: item.product_name,
-    price: Number(item.price),
+  const orderItems = items.map((item) => ({
+    product_id: item.product_id,
     quantity: Number(item.quantity),
-    grind_option: item.grind_option || 'Biji Utuh',
-    subtotal: Number(item.price) * Number(item.quantity)
+    grind_option: item.grind_option || 'Biji Utuh'
   }));
-  const { error: itemsError } = await supabaseClient.from('order_items').insert(itemRows);
-  if (itemsError) {
-    await supabaseClient.from('orders').delete().eq('id', order.id).eq('user_id', user.id);
-    throw new Error(itemsError.message);
-  }
-  if (!payload.items?.length) await supabaseClient.from('cart_items').delete().eq('user_id', user.id);
-  return ok({ ...order, order_items: itemRows });
+  const order = ensureData(await supabaseClient.rpc('checkout_order', {
+    p_order_number: orderNumber,
+    p_shipping_address: payload.shipping_address,
+    p_shipping_phone: payload.shipping_phone,
+    p_payment_method: payload.payment_method || 'Transfer Bank (Simulasi)',
+    p_notes: payload.notes || null,
+    p_items: orderItems,
+    p_clear_cart: !payload.items?.length
+  }));
+  return ok(order);
 };
 
 // Profil pengguna

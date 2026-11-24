@@ -111,7 +111,12 @@ export const AdminDashboard = () => {
           <section className="admin-recent-panel">
             <div className="admin-section-heading">
               <div><span>INVENTARIS</span><h2>Produk di katalog</h2></div>
-              <Link to="/admin/products" className="admin-text-link">Kelola semua <ArrowRight size={16} /></Link>
+              <div className="admin-section-actions">
+                <button type="button" className="admin-refresh-link" onClick={loadDashboard} disabled={loading}>
+                  <RefreshCw size={15} className={loading ? 'spinning' : ''} /> Segarkan
+                </button>
+                <Link to="/admin/products" className="admin-text-link">Kelola semua <ArrowRight size={16} /></Link>
+              </div>
             </div>
 
             {loading ? (

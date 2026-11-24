@@ -24,8 +24,9 @@ Di Supabase Dashboard, pilih **SQL Editor**. Untuk project Supabase baru, jalank
 2. `supabase/seed.sql`
 3. `supabase/direct_access.sql`
 4. `supabase/product_images_storage.sql`
+5. `supabase/checkout_stock.sql`
 
-Jika tabel dan produk BrewSpace sudah ada, jalankan hanya `direct_access.sql` dan `product_images_storage.sql`. Skrip terakhir menyiapkan bucket foto produk dan kebijakan aksesnya.
+Jika tabel dan produk BrewSpace sudah ada, jalankan `direct_access.sql`, `product_images_storage.sql`, dan `checkout_stock.sql`. Skrip checkout menurunkan stok secara aman saat pesanan berhasil dibuat.
 
 ### Akun admin
 
