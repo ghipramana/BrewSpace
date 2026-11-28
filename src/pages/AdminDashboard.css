@@ -146,9 +146,9 @@
 .admin-mobile-store-link { display: none; color: #674a40; }
 
 .admin-content {
-  width: min(100%, 1220px);
-  margin: 0 auto;
-  padding: 34px clamp(20px, 4vw, 52px) 50px;
+  width: 100%;
+  margin: 0;
+  padding: 34px clamp(12px, 1vw, 24px) 50px;
 }
 
 .admin-welcome-panel {
