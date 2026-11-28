@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import { 
   ArrowLeft, Heart, ShoppingBag, Plus, Minus,
-  MapPin, Check, ArrowRight, Star
+  MapPin, Check, ArrowRight, Star, X
 } from 'lucide-react';
 import { LoadingState } from '../components/common/LoadingState';
 import { ErrorState } from '../components/common/ErrorState';
@@ -30,6 +30,7 @@ export const ProductDetail = () => {
   const [comment, setComment] = useState('');
   const [reviewLoading, setReviewLoading] = useState(false);
   const [reviewError, setReviewError] = useState('');
+  const [reviewModalOpen, setReviewModalOpen] = useState(false);
 
   useEffect(() => {
     const fetchDetail = async () => {
@@ -73,6 +74,8 @@ export const ProductDetail = () => {
       const res = await getProductReviews(id);
       setReviews(res.data || []);
       setComment('');
+      setRating(0);
+      setReviewModalOpen(false);
     } catch (err) {
       setReviewError(`Ulasan belum tersimpan. ${err.message}`);
     } finally {
@@ -292,6 +295,9 @@ export const ProductDetail = () => {
                   <span>Beli Sekarang</span>
                   <ArrowRight size={18} />
                 </button>
+                <button type="button" className="review-write-btn" aria-label="Tulis ulasan" title="Tulis ulasan" onClick={() => { setReviewError(''); setReviewModalOpen(true); }}>
+                  <Star size={19} />
+                </button>
               </div>
             </div> : <Link to="/admin/products" className="btn btn-primary admin-product-management-link">
               Kelola produk ini
@@ -309,26 +315,6 @@ export const ProductDetail = () => {
             </div>
           </div>
 
-          {!isAdmin && (user ? (
-            <form className="reviews-form" onSubmit={handleSubmitReview}>
-              <h3 className="option-group-title">Bagikan pengalaman Anda</h3>
-              <label className="form-label">Rating</label>
-              <div className="rating-picker" role="radiogroup" aria-label="Pilih rating 1 sampai 5">
-                {[1, 2, 3, 4, 5].map((star) => (
-                  <button key={star} type="button" className="rating-star-button" role="radio" aria-checked={rating === star} aria-label={`${star} dari 5 bintang`} onClick={() => setRating(star)}>
-                    <Star size={26} fill={star <= rating ? 'currentColor' : 'none'} />
-                  </button>
-                ))}
-                {rating > 0 && <span>{rating}/5</span>}
-              </div>
-              <label className="form-label" htmlFor="review-comment">Ulasan</label>
-              <textarea id="review-comment" className="form-textarea" rows="4" maxLength="1000" placeholder="Bagaimana rasa dan aroma kopi ini?" value={comment} onChange={(event) => setComment(event.target.value)} />
-              {reviewError && <p className="review-error" role="alert">{reviewError}</p>}
-              <button className="btn btn-primary" type="submit" disabled={reviewLoading}>{reviewLoading ? 'Menyimpan...' : 'Kirim Ulasan'}</button>
-            </form>
-          ) : <p className="review-hint"><Link to="/login">Masuk</Link> untuk memberi rating dan menulis ulasan.</p>)}
-
-          {reviewError && !user && <p className="review-error" role="alert">{reviewError}</p>}
           {reviews.length ? <div className="reviews-list">
             {reviews.map((review) => <article className="review-card" key={review.id || `${review.user_id}-${review.created_at}`}>
               <div className="review-card-header">
@@ -340,6 +326,26 @@ export const ProductDetail = () => {
           </div> : <p className="review-hint">Belum ada ulasan. Jadilah yang pertama berbagi pengalaman.</p>}
         </section>
       </main>
+
+      {reviewModalOpen && !isAdmin && <div className="review-modal-backdrop" onClick={() => setReviewModalOpen(false)}>
+        <section className="review-modal" role="dialog" aria-modal="true" aria-labelledby="review-modal-title" onClick={(event) => event.stopPropagation()}>
+          <div className="review-modal-heading">
+            <div><span className="review-modal-eyebrow">PENGALAMAN PELANGGAN</span><h2 id="review-modal-title">Tulis Ulasan</h2></div>
+            <button type="button" className="icon-btn" aria-label="Tutup" onClick={() => setReviewModalOpen(false)}><X size={20} /></button>
+          </div>
+          {user ? <form onSubmit={handleSubmitReview}>
+            <label className="form-label">Rating</label>
+            <div className="rating-picker" role="radiogroup" aria-label="Pilih rating 1 sampai 5">
+              {[1, 2, 3, 4, 5].map((star) => <button key={star} type="button" className="rating-star-button" role="radio" aria-checked={rating === star} aria-label={`${star} dari 5 bintang`} onClick={() => setRating(star)}><Star size={28} fill={star <= rating ? 'currentColor' : 'none'} /></button>)}
+              {rating > 0 && <span>{rating}/5</span>}
+            </div>
+            <label className="form-label" htmlFor="review-comment">Ulasan</label>
+            <textarea id="review-comment" className="form-textarea" rows="5" maxLength="1000" placeholder="Bagaimana rasa dan aroma kopi ini?" value={comment} onChange={(event) => setComment(event.target.value)} />
+            {reviewError && <p className="review-error" role="alert">{reviewError}</p>}
+            <button className="btn btn-primary review-submit-btn" type="submit" disabled={reviewLoading}>{reviewLoading ? 'Menyimpan...' : 'Kirim Ulasan'}</button>
+          </form> : <p className="review-hint"><Link to="/login">Masuk</Link> untuk memberi rating dan menulis ulasan.</p>}
+        </section>
+      </div>}
 
       {/* Added Toast Notification */}
       {addedToast && !isAdmin && (
@@ -374,6 +380,16 @@ export const ProductDetail = () => {
             {formatRupiah(product.price * quantity)}
           </span>
         </div>
+
+        <button
+          type="button"
+          className="review-write-btn"
+          aria-label="Tulis ulasan"
+          title="Tulis ulasan"
+          onClick={() => { setReviewError(''); setReviewModalOpen(true); }}
+        >
+          <Star size={19} />
+        </button>
 
         <button
           onClick={handleAddToCart}
