@@ -108,6 +108,39 @@ export const getProductById = async (id) => {
   return ok(ensureData(await supabaseClient.from('products').select('*, categories(id, name, slug, description)').eq('id', id).single()));
 };
 
+// Ulasan produk
+export const getProductReviews = async (productId) => {
+  if (!supabaseClient) {
+    const reviews = stored('brewspace_product_reviews', []);
+    return ok(reviews.filter((review) => String(review.product_id) === String(productId))
+      .sort((a, b) => new Date(b.created_at) - new Date(a.created_at)));
+  }
+  const data = ensureData(await supabaseClient.from('product_reviews').select('*')
+    .eq('product_id', String(productId)).order('created_at', { ascending: false }));
+  return ok(data);
+};
+
+export const saveProductReview = async ({ productId, rating, comment, user }) => {
+  const review = {
+    product_id: String(productId),
+    user_id: user.id,
+    author_name: user.user_metadata?.full_name || user.email?.split('@')[0] || 'Pelanggan',
+    rating,
+    comment: comment.trim(),
+    created_at: new Date().toISOString()
+  };
+  if (!supabaseClient) {
+    const reviews = stored('brewspace_product_reviews', []);
+    const existingIndex = reviews.findIndex((item) => String(item.product_id) === String(productId) && item.user_id === user.id);
+    if (existingIndex >= 0) reviews[existingIndex] = { ...reviews[existingIndex], ...review };
+    else reviews.unshift({ id: `local-${Date.now()}`, ...review });
+    save('brewspace_product_reviews', reviews);
+    return ok(review);
+  }
+  return ok(ensureData(await supabaseClient.from('product_reviews')
+    .upsert(review, { onConflict: 'product_id,user_id' }).select().single()));
+};
+
 export const createProduct = async (productData) => {
   if (!supabaseClient) {
     const products = getLocalProducts();

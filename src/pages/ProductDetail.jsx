@@ -2,11 +2,11 @@ import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import { 
   ArrowLeft, Heart, ShoppingBag, Plus, Minus,
-  MapPin, Check, ArrowRight
+  MapPin, Check, ArrowRight, Star
 } from 'lucide-react';
 import { LoadingState } from '../components/common/LoadingState';
 import { ErrorState } from '../components/common/ErrorState';
-import { getProductById, addFavorite, removeFavorite } from '../services/api';
+import { getProductById, addFavorite, removeFavorite, getProductReviews, saveProductReview } from '../services/api';
 import { formatRupiah } from '../config/constants';
 import { useCart } from '../context/CartContext';
 import { useAuth } from '../context/AuthContext';
@@ -16,7 +16,7 @@ export const ProductDetail = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const { addItem, itemCount } = useCart();
-  const { isAdmin } = useAuth();
+  const { isAdmin, user } = useAuth();
 
   const [product, setProduct] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -25,6 +25,11 @@ export const ProductDetail = () => {
   const [quantity, setQuantity] = useState(1);
   const [isFav, setIsFav] = useState(false);
   const [addedToast, setAddedToast] = useState(false);
+  const [reviews, setReviews] = useState([]);
+  const [rating, setRating] = useState(0);
+  const [comment, setComment] = useState('');
+  const [reviewLoading, setReviewLoading] = useState(false);
+  const [reviewError, setReviewError] = useState('');
 
   useEffect(() => {
     const fetchDetail = async () => {
@@ -47,6 +52,37 @@ export const ProductDetail = () => {
 
     fetchDetail();
   }, [id]);
+
+  useEffect(() => {
+    let active = true;
+    getProductReviews(id)
+      .then((res) => { if (active) setReviews(res.data || []); })
+      .catch((err) => { if (active) setReviewError(`Ulasan gagal dimuat: ${err.message}`); });
+    return () => { active = false; };
+  }, [id]);
+
+  const handleSubmitReview = async (event) => {
+    event.preventDefault();
+    if (!user) return;
+    if (!rating) { setReviewError('Pilih rating bintang 1 sampai 5.'); return; }
+    if (!comment.trim()) { setReviewError('Tulis komentar ulasan terlebih dahulu.'); return; }
+    try {
+      setReviewLoading(true);
+      setReviewError('');
+      await saveProductReview({ productId: id, rating, comment, user });
+      const res = await getProductReviews(id);
+      setReviews(res.data || []);
+      setComment('');
+    } catch (err) {
+      setReviewError(`Ulasan belum tersimpan. ${err.message}`);
+    } finally {
+      setReviewLoading(false);
+    }
+  };
+
+  const averageRating = reviews.length
+    ? reviews.reduce((sum, review) => sum + Number(review.rating), 0) / reviews.length
+    : 0;
 
   const handleToggleFavorite = async () => {
     try {
@@ -262,6 +298,47 @@ export const ProductDetail = () => {
             </Link>}
           </div>
         </div>
+
+        <section className="reviews-section" aria-labelledby="reviews-title">
+          <div className="reviews-header">
+            <h2 className="reviews-title" id="reviews-title">Ulasan Pelanggan</h2>
+            <div className="rating-summary" aria-label={`${averageRating.toFixed(1)} dari 5, ${reviews.length} ulasan`}>
+              <span className="rating-stars" aria-hidden="true">{[1, 2, 3, 4, 5].map((star) => <Star key={star} size={17} fill={star <= Math.round(averageRating) ? 'currentColor' : 'none'} />)}</span>
+              <strong>{averageRating ? averageRating.toFixed(1) : '0.0'}</strong>
+              <span>({reviews.length} ulasan)</span>
+            </div>
+          </div>
+
+          {!isAdmin && (user ? (
+            <form className="reviews-form" onSubmit={handleSubmitReview}>
+              <h3 className="option-group-title">Bagikan pengalaman Anda</h3>
+              <label className="form-label">Rating</label>
+              <div className="rating-picker" role="radiogroup" aria-label="Pilih rating 1 sampai 5">
+                {[1, 2, 3, 4, 5].map((star) => (
+                  <button key={star} type="button" className="rating-star-button" role="radio" aria-checked={rating === star} aria-label={`${star} dari 5 bintang`} onClick={() => setRating(star)}>
+                    <Star size={26} fill={star <= rating ? 'currentColor' : 'none'} />
+                  </button>
+                ))}
+                {rating > 0 && <span>{rating}/5</span>}
+              </div>
+              <label className="form-label" htmlFor="review-comment">Ulasan</label>
+              <textarea id="review-comment" className="form-textarea" rows="4" maxLength="1000" placeholder="Bagaimana rasa dan aroma kopi ini?" value={comment} onChange={(event) => setComment(event.target.value)} />
+              {reviewError && <p className="review-error" role="alert">{reviewError}</p>}
+              <button className="btn btn-primary" type="submit" disabled={reviewLoading}>{reviewLoading ? 'Menyimpan...' : 'Kirim Ulasan'}</button>
+            </form>
+          ) : <p className="review-hint"><Link to="/login">Masuk</Link> untuk memberi rating dan menulis ulasan.</p>)}
+
+          {reviewError && !user && <p className="review-error" role="alert">{reviewError}</p>}
+          {reviews.length ? <div className="reviews-list">
+            {reviews.map((review) => <article className="review-card" key={review.id || `${review.user_id}-${review.created_at}`}>
+              <div className="review-card-header">
+                <div><div className="review-author">{review.author_name || 'Pelanggan'}</div><div className="review-date">{new Date(review.created_at).toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' })}</div></div>
+                <div className="rating-stars" aria-label={`${review.rating} dari 5 bintang`}>{[1, 2, 3, 4, 5].map((star) => <Star key={star} size={15} fill={star <= review.rating ? 'currentColor' : 'none'} />)}</div>
+              </div>
+              <p className="review-comment">{review.comment}</p>
+            </article>)}
+          </div> : <p className="review-hint">Belum ada ulasan. Jadilah yang pertama berbagi pengalaman.</p>}
+        </section>
       </main>
 
       {/* Added Toast Notification */}
