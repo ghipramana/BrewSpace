@@ -148,7 +148,7 @@
 .admin-content {
   width: 100%;
   margin: 0;
-  padding: 34px clamp(12px, 1vw, 24px) 50px;
+  padding: 34px clamp(24px, 2.2vw, 48px) 50px;
 }
 
 .admin-welcome-panel {
